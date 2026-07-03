@@ -1,6 +1,6 @@
 package com.plamaka.hotel_reservation_api.dto.response;
 
-import com.plamaka.hotel_reservation_api.entity.RoomStatus;
+import com.plamaka.hotel_reservation_api.enums.RoomStatus;
 
 public class RoomResponseDTO {
 	
@@ -10,9 +10,57 @@ public class RoomResponseDTO {
 	
 	private Integer floor;
 
-	private RoomStatus roomstatus;
+	private RoomStatus roomStatus;
 
-	private Long roomTypeId;
+	private String typeName;
+	
+	private Integer capacity;
+	
+	private Double pricePerNight;
+	
+	private Boolean balcony;
+	
+	private Boolean petsAllowed;
+
+	public String getTypeName() {
+		return typeName;
+	}
+
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
+	}
+
+	public Integer getCapacity() {
+		return capacity;
+	}
+
+	public void setCapacity(Integer capacity) {
+		this.capacity = capacity;
+	}
+
+	public Double getPricePerNight() {
+		return pricePerNight;
+	}
+
+	public void setPricePerNight(Double pricePerNight) {
+		this.pricePerNight = pricePerNight;
+	}
+
+	public Boolean getBalcony() {
+		return balcony;
+	}
+
+	public void setBalcony(Boolean balcony) {
+		this.balcony = balcony;
+	}
+
+	public Boolean getPetsAllowed() {
+		return petsAllowed;
+	}
+
+	public void setPetsAllowed(Boolean petsAllowed) {
+		this.petsAllowed = petsAllowed;
+	}
 
 	public Long getId() {
 		return id;
@@ -38,19 +86,11 @@ public class RoomResponseDTO {
 		this.floor = floor;
 	}
 
-	public RoomStatus getRoomstatus() {
-		return roomstatus;
+	public RoomStatus getRoomStatus() {
+		return roomStatus;
 	}
 
-	public void setRoomstatus(RoomStatus roomstatus) {
-		this.roomstatus = roomstatus;
-	}
-
-	public Long getRoomTypeId() {
-		return roomTypeId;
-	}
-
-	public void setRoomTypeId(Long roomTypeId) {
-		this.roomTypeId = roomTypeId;
+	public void setRoomStatus(RoomStatus roomStatus) {
+		this.roomStatus = roomStatus;
 	}
 }

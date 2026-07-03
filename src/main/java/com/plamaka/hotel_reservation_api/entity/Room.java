@@ -2,6 +2,8 @@ package com.plamaka.hotel_reservation_api.entity;
 
 import java.util.List;
 
+import com.plamaka.hotel_reservation_api.enums.RoomStatus;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -14,10 +16,6 @@ import jakarta.persistence.OneToMany;
 
 @Entity(name = "Rooms")
 public class Room {
-//	id
-//	roomNumber
-//	status
-//	roomType
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +26,7 @@ public class Room {
 	private Integer floor;
 	
 	@Enumerated(EnumType.STRING)
-	private RoomStatus roomstatus;
+	private RoomStatus roomStatus;
 	
 	@ManyToOne
 	@JoinColumn(name = "room_type_id")
@@ -42,12 +40,11 @@ public class Room {
 	public Room() {
 	}
 	
-	public Room(String roomNumber, Integer floor, RoomStatus roomstatus, RoomType roomType, Boolean balcony) {
+	public Room(String roomNumber, Integer floor, RoomStatus roomstatus, Boolean balcony) {
 		super();
 		this.roomNumber = roomNumber;
 		this.floor = floor;
-		this.roomstatus = roomstatus;
-		this.roomType = roomType;
+		this.roomStatus = roomstatus;
 		this.balcony = balcony;
 	}
 	
@@ -84,12 +81,12 @@ public class Room {
 		this.roomNumber = roomNumber;
 	}
 
-	public RoomStatus getRoomstatus() {
-		return roomstatus;
+	public RoomStatus getRoomStatus() {
+		return roomStatus;
 	}
 
-	public void setRoomstatus(RoomStatus roomstatus) {
-		this.roomstatus = roomstatus;
+	public void setRoomStatus(RoomStatus roomStatus) {
+		this.roomStatus = roomStatus;
 	}
 
 	public RoomType getRoomType() {

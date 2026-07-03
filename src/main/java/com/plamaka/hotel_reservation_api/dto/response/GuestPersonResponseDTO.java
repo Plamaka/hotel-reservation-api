@@ -1,23 +1,23 @@
 package com.plamaka.hotel_reservation_api.dto.response;
 
-import com.plamaka.hotel_reservation_api.entity.GuestType;
+import com.plamaka.hotel_reservation_api.enums.GuestType;
 
 public class GuestPersonResponseDTO {
 	
-	private Integer Number;
+	private Long id;
 	
 	private String fullName;
 	
     private GuestType guestType;
-    
-	public Integer getNumber() {
-		return Number;
+	
+	public Long getId() {
+		return id;
 	}
 
-	public void setNumber(Integer number) {
-		Number = number;
+	public void setId(Long id) {
+		this.id = id;
 	}
-	
+
 	public String getFullName() {
 		return fullName;
 	}

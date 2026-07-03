@@ -1,10 +1,12 @@
 package com.plamaka.hotel_reservation_api.controller;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.plamaka.hotel_reservation_api.dto.request.GuestPersonRequeastDTO;
 import com.plamaka.hotel_reservation_api.dto.response.GuestPersonResponseDTO;
 import com.plamaka.hotel_reservation_api.service.GuestPersonService;
 
@@ -17,8 +19,13 @@ public class GuestPersonController {
 		this.guestPersonService = guestPersonService;
 	}
 	
-	@GetMapping(path = "/guest-persons/{id}")
-	public List<GuestPersonResponseDTO> getPersonsByReervation(Long id) {
-		return guestPersonService.findGuestPersonsByReservationId(id);
+	@PostMapping(path = "/guest-persons")
+	public GuestPersonResponseDTO addPersonGuest(@RequestBody GuestPersonRequeastDTO request) {
+		return guestPersonService.createPersonGuest(request);
+	}
+	
+	@PutMapping(path = "/guest-persons/{id}")
+	public GuestPersonResponseDTO addPersonGuest(@PathVariable Long id, @RequestBody GuestPersonRequeastDTO request ) {
+		return guestPersonService.updatePersonGuest(id, request);
 	}
 }

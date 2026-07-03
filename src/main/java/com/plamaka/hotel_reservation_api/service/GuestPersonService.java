@@ -1,8 +1,5 @@
 package com.plamaka.hotel_reservation_api.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import com.plamaka.hotel_reservation_api.dto.request.GuestPersonRequeastDTO;
@@ -21,23 +18,6 @@ public class GuestPersonService {
 	public GuestPersonService(GuestPersonRepository guestPersonRepository, ReservationRepository reservationRepository) {
 		this.guestPersonRepository = guestPersonRepository;
 		this.reservationRepository = reservationRepository;
-	}
-	
-	public List<GuestPersonResponseDTO> findGuestPersonsByReservationId(Long id){
-		List<GuestPerson> guests = guestPersonRepository.findByReservationId(id);
-		
-		List<GuestPersonResponseDTO> response = new ArrayList<>();
-		for(var guest : guests) {
-			GuestPersonResponseDTO dto = new GuestPersonResponseDTO();
-			
-			dto.setNumber(guests.indexOf(guest) + 1);
-			dto.setFullName(guest.toStringFullName());
-			dto.setGuestType(guest.getGuestType());
-			
-			response.add(dto);
-		}
-		
-		return response;
 	}
 	
 	public GuestPersonResponseDTO createPersonGuest(GuestPersonRequeastDTO requestDto) {
@@ -61,4 +41,39 @@ public class GuestPersonService {
 		
 		return response;	
 	}
+	
+	public GuestPersonResponseDTO updatePersonGuest(Long id, GuestPersonRequeastDTO requestDto) {
+		
+		GuestPerson person = guestPersonRepository.findById(id).orElseThrow();
+		
+		person.setFirstName(requestDto.getFirstName());
+		person.setLastName(requestDto.getLastName());
+		person.setBirthDate(requestDto.getBirthDate());
+		person.setGuestType(requestDto.getGuestType());
+		
+		GuestPerson saved = guestPersonRepository.save(person);
+		
+		GuestPersonResponseDTO response = new GuestPersonResponseDTO();
+		
+		response.setFullName(saved.toStringFullName());
+		response.setGuestType(saved.getGuestType());
+		
+		return response;	
+	}
+	
+	public void removePersonGuestFromReservation(Long personId,Long reservationId) {
+		
+		
+		GuestPerson person = guestPersonRepository.findById(personId).orElseThrow();
+		
+		Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
+		
+		
+		reservation.getGuestPersons().remove(person);
+		
+		reservationRepository.save(reservation);
+		
+		
+	}
+	
 }

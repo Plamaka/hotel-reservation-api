@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,8 @@ import com.plamaka.hotel_reservation_api.service.GuestService;
 
 @RestController
 public class GuestController {
+//	GET /guests/{id}
+
 	private final GuestService guestService;
 	
 	public GuestController(GuestService guestService) {
@@ -32,12 +35,12 @@ public class GuestController {
 	}
 	
 	@PutMapping(path = "/guests")
-	public GuestResponseDTO updateGuest(Long id,@RequestBody GuestRequestDTO requestDto) {
+	public GuestResponseDTO updateGuest(@PathVariable Long id,@RequestBody GuestRequestDTO requestDto) {
 		return guestService.updateGuest(id,requestDto);
 	}
 	
 	@DeleteMapping(path = "/guests")
-	public void deleteGuest(Long id) {
+	public void deleteGuest(@PathVariable Long id) {
 		guestService.deleteGuest(id);
 	}
 

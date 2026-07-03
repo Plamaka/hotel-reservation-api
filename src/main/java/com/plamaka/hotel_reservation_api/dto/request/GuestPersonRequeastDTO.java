@@ -2,7 +2,7 @@ package com.plamaka.hotel_reservation_api.dto.request;
 
 import java.time.LocalDate;
 
-import com.plamaka.hotel_reservation_api.entity.GuestType;
+import com.plamaka.hotel_reservation_api.enums.GuestType;
 
 public class GuestPersonRequeastDTO {
 	private String firstName;

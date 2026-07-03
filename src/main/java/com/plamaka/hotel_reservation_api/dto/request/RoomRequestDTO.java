@@ -1,6 +1,6 @@
 package com.plamaka.hotel_reservation_api.dto.request;
 
-import com.plamaka.hotel_reservation_api.entity.RoomStatus;
+import com.plamaka.hotel_reservation_api.enums.RoomStatus;
 
 public class RoomRequestDTO {
 	private String roomNumber;

@@ -1,4 +1,4 @@
-package com.plamaka.hotel_reservation_api.entity;
+package com.plamaka.hotel_reservation_api.enums;
 
 public enum ReservationStatus {
 	PENDING,

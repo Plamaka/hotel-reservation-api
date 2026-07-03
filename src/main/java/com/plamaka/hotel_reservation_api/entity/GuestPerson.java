@@ -2,6 +2,8 @@ package com.plamaka.hotel_reservation_api.entity;
 
 import java.time.LocalDate;
 
+import com.plamaka.hotel_reservation_api.enums.GuestType;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
