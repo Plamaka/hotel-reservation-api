@@ -9,23 +9,28 @@ import com.plamaka.hotel_reservation_api.dto.request.RoomRequestDTO;
 import com.plamaka.hotel_reservation_api.dto.response.RoomResponseDTO;
 import com.plamaka.hotel_reservation_api.entity.Room;
 import com.plamaka.hotel_reservation_api.entity.RoomType;
+import com.plamaka.hotel_reservation_api.enums.ReservationStatus;
 import com.plamaka.hotel_reservation_api.enums.RoomStatus;
+import com.plamaka.hotel_reservation_api.exception.RoomHasReservationsException;
+import com.plamaka.hotel_reservation_api.exception.RoomNotFoundException;
+import com.plamaka.hotel_reservation_api.exception.RoomTypeNotFoundException;
+import com.plamaka.hotel_reservation_api.repository.ReservationRoomRepository;
 import com.plamaka.hotel_reservation_api.repository.RoomRepository;
 import com.plamaka.hotel_reservation_api.repository.RoomTypeRepository;
 
 @Service
 public class RoomService {
 
-//	✅ Find Available Rooms
-//	✅ Find Rooms By Status
-//	✅ Find Rooms By Floor
-//	✅ Find Rooms By RoomType
 	private final RoomRepository roomRepository;
 	private final RoomTypeRepository roomTypeRepository;
+	private final ReservationRoomRepository reservationRoomRepository;
 	
-	public RoomService(RoomRepository roomRepository, RoomTypeRepository roomTypeRepository) {
+	public RoomService(RoomRepository roomRepository,
+			RoomTypeRepository roomTypeRepository, 
+			ReservationRoomRepository reservationRoomRepository) {
 		this.roomRepository = roomRepository;
 		this.roomTypeRepository = roomTypeRepository;
+		this.reservationRoomRepository = reservationRoomRepository;
 	}
 	
 	public List<RoomResponseDTO> findAvailableRooms(){
@@ -128,10 +133,11 @@ public class RoomService {
 	
 	public RoomResponseDTO addRoom(RoomRequestDTO requestDto) {
 		
-		RoomType type = roomTypeRepository.findById(requestDto.getRoomTypeId()).orElseThrow();
+		RoomType type = roomTypeRepository.findById(requestDto.getRoomTypeId()).orElseThrow(
+				() -> new RoomNotFoundException(requestDto.getRoomTypeId()));
 		
 		Room room = new Room(
-				requestDto.getRoomNumber(),
+				requestDto.getRoomNumber(), 
 				requestDto.getFloor(),
 				requestDto.getRoomstatus(),
 				requestDto.getBalcony());
@@ -157,9 +163,11 @@ public class RoomService {
 	
 	public RoomResponseDTO updateRoom(Long id, RoomRequestDTO requestDto) {
 		
-		Room room = roomRepository.findById(id).orElseThrow();
+		Room room = roomRepository.findById(id).orElseThrow(
+				() -> new RoomNotFoundException(requestDto.getRoomTypeId()));
 		
-		RoomType type = roomTypeRepository.findById(requestDto.getRoomTypeId()).orElseThrow();
+		RoomType type = roomTypeRepository.findById(requestDto.getRoomTypeId()).orElseThrow(
+				() -> new RoomTypeNotFoundException(requestDto.getRoomTypeId()));
 		
 		room.setRoomNumber(requestDto.getRoomNumber());
 		room.setFloor(requestDto.getFloor());
@@ -186,10 +194,16 @@ public class RoomService {
 	
 	public void deleteRoom(Long id) {
 		
-		Room room = roomRepository.findById(id).orElseThrow();
+		Room room = roomRepository.findById(id).orElseThrow(
+				() -> new RoomNotFoundException(id));
 		
-		if(!room.getReservationRooms().isEmpty()) {
-//			throw new Exepption
+		if (reservationRoomRepository.existsByRoomIdAndReservationStatusIn(
+		        room.getId(),
+		        List.of(
+		                ReservationStatus.CONFIRMED,
+		                ReservationStatus.CHECKED_IN))) {
+
+		    throw new RoomHasReservationsException(room.getId());
 		}
 		
 		roomRepository.delete(room);

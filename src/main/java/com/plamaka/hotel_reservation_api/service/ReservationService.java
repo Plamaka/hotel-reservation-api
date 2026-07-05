@@ -22,6 +22,11 @@ import com.plamaka.hotel_reservation_api.entity.Room;
 import com.plamaka.hotel_reservation_api.enums.GuestType;
 import com.plamaka.hotel_reservation_api.enums.ReservationStatus;
 import com.plamaka.hotel_reservation_api.enums.RoomStatus;
+import com.plamaka.hotel_reservation_api.exception.ExceededRoomCapacityException;
+import com.plamaka.hotel_reservation_api.exception.GuestNotFoundException;
+import com.plamaka.hotel_reservation_api.exception.ReservationConflictException;
+import com.plamaka.hotel_reservation_api.exception.ReservationNotFoundException;
+import com.plamaka.hotel_reservation_api.exception.RoomNotFoundException;
 import com.plamaka.hotel_reservation_api.repository.GuestPersonRepository;
 import com.plamaka.hotel_reservation_api.repository.GuestRepository;
 import com.plamaka.hotel_reservation_api.repository.ReservationRepository;
@@ -141,7 +146,8 @@ public class ReservationService {
 	}
 	
 	public ReservationResponseDTO getReservationById(Long id) {
-		Reservation reservations = reservationRepository.findById(id).orElseThrow();
+		Reservation reservations = reservationRepository.findById(id).orElseThrow(
+				() -> new ReservationNotFoundException(id));
 		
 		Guest guest = reservations.getGuest();
 		GuestResponseDTO guestResponse = new GuestResponseDTO();
@@ -195,7 +201,8 @@ public class ReservationService {
 	@Transactional
 	public ReservationResponseDTO createReservation(ReservationRequestDTO requestDto) {
 		
-		Guest guest = guestRepository.findById(requestDto.getGuestId()).orElseThrow();
+		Guest guest = guestRepository.findById(requestDto.getGuestId()).orElseThrow(
+				() -> new GuestNotFoundException(requestDto.getGuestId()));
 		
 		List<GuestPerson> gps = new ArrayList<>();
 		List<ReservationRoom> rrs = new ArrayList<>();
@@ -210,13 +217,25 @@ public class ReservationService {
 		res.setGuest(guest);
 
 		for(var roomId : requestDto.getRoomIds()) {
-			Room room = roomRepository.findById(roomId).orElseThrow();
+			Room room = roomRepository.findById(roomId).orElseThrow(
+					() -> new RoomNotFoundException(roomId));
+			
 			rs.add(room);
 			
-			if ((reservationRoomRepository.countConflictingReservations(
-					roomId, requestDto.getCheckInDate(), requestDto.getCheckOutDate(), ReservationStatus.CANCELLED) > 0)) {
-//				throw new..
-			}
+			ReservationRoom conflict =
+				    reservationRoomRepository.findConflictingReservation(
+				            roomId,
+				            requestDto.getCheckInDate(),
+				            requestDto.getCheckOutDate(),
+				            ReservationStatus.CANCELLED)
+				    .orElse(null);
+
+				if (conflict != null) {
+				    throw new ReservationConflictException(
+				            roomId,
+				            conflict.getReservation().getCheckInDate(),
+				            conflict.getReservation().getCheckOutDate());
+				}
 			
 			res.setTotalAmount(res.getTotalAmount() + totalSum(
 					requestDto.getCheckInDate(), requestDto.getCheckOutDate(), room));
@@ -241,9 +260,7 @@ public class ReservationService {
 			gps.add(gp);
 		}
 
-		if(exceededRoomCapacity(gps.size() + 1, rs)) {
-//			throw new
-		}
+		exceededRoomCapacity(gps.size() + 1, rs);
 		
 		res.setDepositAmount(res.getTotalAmount() * 0.5);
 		
@@ -307,21 +324,38 @@ public class ReservationService {
 	}
 	
 	public GetReservationResponseDTO updateReservation(Long id, UpdateReservationRequestDTO requestDto) {
-		Reservation res = reservationRepository.findById(id).orElseThrow(null);
-		List<ReservationRoom> rrs = res.getReservationRoom();
+		Reservation res = reservationRepository.findById(id).orElseThrow(
+				() -> new ReservationNotFoundException(id));
+		
 		
 		res.setCheckInDate(requestDto.getCheckInDate());
 		res.setCheckOutDate(requestDto.getCheckOutDate());
 		res.getReservationRoom().clear();
 		
-		for(var roomId : requestDto.getRoomIds()) {
-			Room room = roomRepository.findById(roomId).orElseThrow();
-		
+		List<ReservationRoom> rrsOld = res.getReservationRoom();
 			
-			if ((reservationRoomRepository.countConflictingReservations(
-					roomId, requestDto.getCheckInDate(), requestDto.getCheckOutDate(), ReservationStatus.CANCELLED) > 0)) {
-//				throw new..
-			}
+		List<GuestPerson> gps = res.getGuestPersons();
+		List<Room> rs = new ArrayList<>();
+		for(var roomId : requestDto.getRoomIds()) {
+			Room room = roomRepository.findById(roomId).orElseThrow(
+					() -> new RoomNotFoundException(roomId));
+			
+			rs.add(room);
+			
+			ReservationRoom conflict =
+				    reservationRoomRepository.findConflictingReservation(
+				            roomId,
+				            requestDto.getCheckInDate(),
+				            requestDto.getCheckOutDate(),
+				            ReservationStatus.CANCELLED)
+				    .orElse(null);
+
+				if (conflict != null) {
+				    throw new ReservationConflictException(
+				            roomId,
+				            conflict.getReservation().getCheckInDate(),
+				            conflict.getReservation().getCheckOutDate());
+				}
 			
 			res.setTotalAmount(res.getTotalAmount() + totalSum(
 					requestDto.getCheckInDate(), requestDto.getCheckOutDate(), room));
@@ -330,18 +364,20 @@ public class ReservationService {
 			rr.setReservation(res);
 			rr.setRoom(room);
 			
-			rrs.add(rr);
+			rrsOld.add(rr);
 		}
 		
-		res.setReservationRoom(rrs);
+		exceededRoomCapacity(gps.size() + 1, rs);
+		
+		res.setReservationRoom(rrsOld);
 		Reservation saved = reservationRepository.save(res);
 		
 		GetReservationResponseDTO dto = new GetReservationResponseDTO();
 		
 		
-		List<ReservationRoom> rs = saved.getReservationRoom();
+		List<ReservationRoom> rrsNew = saved.getReservationRoom();
 		List<RoomReservationResponseDTO> rrrDTOs  = new ArrayList<>();
-		for(var r : rs) {
+		for(var r : rrsNew) {
 			RoomReservationResponseDTO rrrDto = new RoomReservationResponseDTO();
 			
 			Room room = r.getRoom();
@@ -373,7 +409,8 @@ public class ReservationService {
 	
 	
 	public void cancelReservation(Long id) {
-		 Reservation res = reservationRepository.findById(id).orElseThrow(null);
+		 Reservation res = reservationRepository.findById(id).orElseThrow(
+				 () -> new ReservationNotFoundException(id));
 		 
 	 	res.setStatus(ReservationStatus.CANCELLED);
 	 	
@@ -381,7 +418,9 @@ public class ReservationService {
 	}
 	
 	public void chackInReservation(Long id) {
-		Reservation res = reservationRepository.findById(id).orElseThrow(null);
+		Reservation res = reservationRepository.findById(id).orElseThrow(
+				 () -> new ReservationNotFoundException(id));
+		 
 		List<ReservationRoom> rrs = reservationRoomRepository.findByReservationId(id);
 		 
 	 	res.setStatus(ReservationStatus.CHECKED_IN);
@@ -402,7 +441,9 @@ public class ReservationService {
 	}
 	
 	public void chackOutReservation(Long id) {
-		 Reservation res = reservationRepository.findById(id).orElseThrow(null);
+		 Reservation res = reservationRepository.findById(id).orElseThrow(
+				 () -> new ReservationNotFoundException(id));
+		 
 		 List<ReservationRoom> rrs = reservationRoomRepository.findByReservationId(id);
 		 
 	 	res.setStatus(ReservationStatus.CHECKED_OUT);
@@ -422,15 +463,6 @@ public class ReservationService {
 	 	reservationRepository.save(res);
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	public GuestType isLegal(LocalDate birthDate) {
 		Period period = Period.between(birthDate, LocalDate.now());
 		
@@ -442,7 +474,7 @@ public class ReservationService {
 		}
 	}
 	
-	public Boolean exceededRoomCapacity(Integer guest, List<Room> rooms) {
+	public void exceededRoomCapacity(Integer guest, List<Room> rooms) {
 		int totalCapacity = 0;
 		
 		for(var room : rooms) {
@@ -450,11 +482,9 @@ public class ReservationService {
 		}
 		
 		if(totalCapacity < guest) {
-			return true;
+			throw new ExceededRoomCapacityException(totalCapacity - guest);
 		}
-		else {
-			return false;
-		}
+
 	}
 	
 	public Double totalSum(LocalDate checkIn, LocalDate checkOut, Room room) {

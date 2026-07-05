@@ -2,6 +2,7 @@ package com.plamaka.hotel_reservation_api.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,14 +16,14 @@ import com.plamaka.hotel_reservation_api.enums.ReservationStatus;
 public interface ReservationRoomRepository extends JpaRepository<ReservationRoom, Long> {
 
 	@Query("""
-		    SELECT COUNT(rr)
+		    SELECT rr
 		    FROM ReservationRoom rr
 		    WHERE rr.room.id = :roomId
 		      AND rr.reservation.checkInDate < :checkOut
 		      AND rr.reservation.checkOutDate > :checkIn
 		      AND rr.reservation.status <> :status
 		    """)
-		long countConflictingReservations(
+	Optional<ReservationRoom> findConflictingReservation(
 		        @Param("roomId") Long roomId,
 		        @Param("checkOut") LocalDate checkOut,
 		        @Param("checkIn") LocalDate checkIn,
@@ -30,5 +31,7 @@ public interface ReservationRoomRepository extends JpaRepository<ReservationRoom
 	
 	List<ReservationRoom> findByReservationId(Long reservationId);
 	
-	
+	boolean existsByRoomIdAndReservationStatusIn(
+	        Long roomId,
+	        List<ReservationStatus> statuses);
 }

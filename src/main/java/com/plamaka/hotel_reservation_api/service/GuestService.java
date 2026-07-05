@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.plamaka.hotel_reservation_api.dto.request.GuestRequestDTO;
 import com.plamaka.hotel_reservation_api.dto.response.GuestResponseDTO;
 import com.plamaka.hotel_reservation_api.entity.Guest;
+import com.plamaka.hotel_reservation_api.exception.GuestNotFoundException;
 import com.plamaka.hotel_reservation_api.repository.GuestRepository;
 
 @Service
@@ -59,7 +60,8 @@ public class GuestService {
 	}
 	
 	public GuestResponseDTO updateGuest(Long id, GuestRequestDTO requestDto) {
-		Guest guest = guestRepository.findById(id).orElse(null);
+		Guest guest = guestRepository.findById(id).orElseThrow(
+				() -> new GuestNotFoundException(id));
 		
 		guest.setFirstName(requestDto.getFirstName());
 		guest.setMiddleName(requestDto.getMiddleName());
@@ -79,7 +81,8 @@ public class GuestService {
 	}
 	
 	public void deleteGuest(Long id) {
-		Guest guest = guestRepository.findById(id).orElse(null);
+		Guest guest = guestRepository.findById(id).orElseThrow(
+				() -> new GuestNotFoundException(id));
 		
 		guest.setIsDeleted(true);
 		

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.plamaka.hotel_reservation_api.dto.request.RoomTypeRequestDTO;
 import com.plamaka.hotel_reservation_api.dto.response.RoomTypeResponseDTO;
 import com.plamaka.hotel_reservation_api.entity.RoomType;
+import com.plamaka.hotel_reservation_api.exception.RoomTypeNotFoundException;
 import com.plamaka.hotel_reservation_api.repository.RoomTypeRepository;
 
 @Service
@@ -61,7 +62,8 @@ public class RoomTypeService {
 	}
 	
 	public RoomTypeResponseDTO updateRoomType(Long id, RoomTypeRequestDTO requestDto) {
-		RoomType type = roomTypeRepository.findById(id).orElse(null);
+		RoomType type = roomTypeRepository.findById(id).orElseThrow(
+				() -> new RoomTypeNotFoundException(id));
 		
 		type.setTypeName(requestDto.getTypeName());
 		type.setCapacity(requestDto.getCapacity());

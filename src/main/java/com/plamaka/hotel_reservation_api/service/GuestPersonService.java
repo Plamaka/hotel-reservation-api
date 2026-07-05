@@ -10,6 +10,8 @@ import com.plamaka.hotel_reservation_api.dto.response.GuestPersonResponseDTO;
 import com.plamaka.hotel_reservation_api.entity.GuestPerson;
 import com.plamaka.hotel_reservation_api.entity.Reservation;
 import com.plamaka.hotel_reservation_api.enums.GuestType;
+import com.plamaka.hotel_reservation_api.exception.GuestPersonNotFoundException;
+import com.plamaka.hotel_reservation_api.exception.ReservationNotFoundException;
 import com.plamaka.hotel_reservation_api.repository.GuestPersonRepository;
 import com.plamaka.hotel_reservation_api.repository.ReservationRepository;
 
@@ -26,7 +28,8 @@ public class GuestPersonService {
 	
 	public GuestPersonResponseDTO createPersonGuest(GuestPersonRequeastDTO requestDto) {
 		
-		Reservation reservation = reservationRepository.findById(requestDto.getReservationId()).orElseThrow();
+		Reservation reservation = reservationRepository.findById(requestDto.getReservationId()).orElseThrow(
+				() -> new ReservationNotFoundException(requestDto.getReservationId()));
 		
 		GuestPerson person = new GuestPerson(
 				requestDto.getFirstName(),
@@ -48,7 +51,8 @@ public class GuestPersonService {
 	
 	public GuestPersonResponseDTO updatePersonGuest(Long id, GuestPersonRequeastDTO requestDto) {
 		
-		GuestPerson person = guestPersonRepository.findById(id).orElseThrow();
+		GuestPerson person = guestPersonRepository.findById(id).orElseThrow(
+				() -> new GuestPersonNotFoundException(id));
 		
 		person.setFirstName(requestDto.getFirstName());
 		person.setLastName(requestDto.getLastName());
@@ -66,7 +70,8 @@ public class GuestPersonService {
 	}
 	
 	public void removePersonGuest(Long personId) {
-		GuestPerson person = guestPersonRepository.findById(personId).orElseThrow();
+		GuestPerson person = guestPersonRepository.findById(personId).orElseThrow(
+				() -> new GuestPersonNotFoundException(personId));
 		
 		guestPersonRepository.delete(person);
 	}
