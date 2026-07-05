@@ -6,12 +6,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
-@Entity(name = "Reservation_Rooms")
+@Entity
+@Table(name = "Reservation_Rooms")
 public class ReservationRoom {
-//	id
-//	reservation
-//	room
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

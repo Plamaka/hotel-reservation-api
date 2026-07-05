@@ -15,17 +15,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
-@Entity(name = "Reservations")
+@Entity
+@Table(name = "Reservations")
 public class Reservation {
-//	id
-//	checkInDate
-//	checkOutDate
-//	guest
-//	adults
-//	kids
-//	paymentMethod
-//	depositAmount
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,18 +47,28 @@ public class Reservation {
 	
 	private Double depositAmount;
 	
+	private Double totalAmount;
+	
+
 	public Reservation() {
 	}
 
 	public Reservation(ReservationStatus status, LocalDate checkInDate,
-			LocalDate checkOutDate, PaymentMethod paymentMethod,
-			Double depositAmount) {
+			LocalDate checkOutDate, PaymentMethod paymentMethod) {
 		super();
 		this.status = status;
 		this.checkInDate = checkInDate;
 		this.checkOutDate = checkOutDate;
 		this.paymentMethod = paymentMethod;
-		this.depositAmount = depositAmount;
+	}
+
+	public Double getTotalAmount() {
+		return totalAmount;
+	}
+	
+	public void setTotalAmount(Double totalAmount) {
+		this.totalAmount = totalAmount;
+
 	}
 
 	public Long getId() {

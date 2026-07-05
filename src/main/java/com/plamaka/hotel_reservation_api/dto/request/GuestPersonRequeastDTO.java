@@ -2,16 +2,12 @@ package com.plamaka.hotel_reservation_api.dto.request;
 
 import java.time.LocalDate;
 
-import com.plamaka.hotel_reservation_api.enums.GuestType;
-
 public class GuestPersonRequeastDTO {
 	private String firstName;
 
     private String lastName;
 
     private LocalDate birthDate;
-    
-    private GuestType guestType;
     
     private Long reservationId;
 
@@ -46,14 +42,4 @@ public class GuestPersonRequeastDTO {
 	public void setBirthDate(LocalDate birthDate) {
 		this.birthDate = birthDate;
 	}
-
-	public GuestType getGuestType() {
-		return guestType;
-	}
-
-	public void setGuestType(GuestType guestType) {
-		this.guestType = guestType;
-	}
-    
-    
 }

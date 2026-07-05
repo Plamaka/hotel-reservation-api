@@ -7,8 +7,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
-@Entity(name = "Room_Types")
+@Entity
+@Table(name = "Room_Types")
 public class RoomType {
 	
 	@Id

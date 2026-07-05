@@ -12,8 +12,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
-@Entity(name = "Guest_Persons")
+@Entity
+@Table(name = "Guest_Persons")
 public class GuestPerson {
 	
 	@Id
@@ -37,12 +39,11 @@ public class GuestPerson {
     public GuestPerson() {
     }
     
-	public GuestPerson(String firstName, String lastName, LocalDate birthDate, GuestType guestType) {
+	public GuestPerson(String firstName, String lastName, LocalDate birthDate) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.birthDate = birthDate;
-		this.guestType = guestType;
 	}
 
 	public Long getId() {

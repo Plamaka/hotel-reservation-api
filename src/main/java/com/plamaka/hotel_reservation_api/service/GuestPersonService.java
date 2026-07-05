@@ -1,11 +1,15 @@
 package com.plamaka.hotel_reservation_api.service;
 
+import java.time.LocalDate;
+import java.time.Period;
+
 import org.springframework.stereotype.Service;
 
 import com.plamaka.hotel_reservation_api.dto.request.GuestPersonRequeastDTO;
 import com.plamaka.hotel_reservation_api.dto.response.GuestPersonResponseDTO;
 import com.plamaka.hotel_reservation_api.entity.GuestPerson;
 import com.plamaka.hotel_reservation_api.entity.Reservation;
+import com.plamaka.hotel_reservation_api.enums.GuestType;
 import com.plamaka.hotel_reservation_api.repository.GuestPersonRepository;
 import com.plamaka.hotel_reservation_api.repository.ReservationRepository;
 
@@ -27,9 +31,9 @@ public class GuestPersonService {
 		GuestPerson person = new GuestPerson(
 				requestDto.getFirstName(),
 				requestDto.getLastName(),
-				requestDto.getBirthDate(),
-				requestDto.getGuestType());
+				requestDto.getBirthDate());
 		
+		person.setGuestType(isLegal(requestDto.getBirthDate()));
 		person.setReservation(reservation);
 		
 		GuestPerson saved = guestPersonRepository.save(person);
@@ -49,7 +53,7 @@ public class GuestPersonService {
 		person.setFirstName(requestDto.getFirstName());
 		person.setLastName(requestDto.getLastName());
 		person.setBirthDate(requestDto.getBirthDate());
-		person.setGuestType(requestDto.getGuestType());
+		person.setGuestType(isLegal(requestDto.getBirthDate()));
 		
 		GuestPerson saved = guestPersonRepository.save(person);
 		
@@ -61,19 +65,21 @@ public class GuestPersonService {
 		return response;	
 	}
 	
-	public void removePersonGuestFromReservation(Long personId,Long reservationId) {
-		
-		
+	public void removePersonGuest(Long personId) {
 		GuestPerson person = guestPersonRepository.findById(personId).orElseThrow();
 		
-		Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
-		
-		
-		reservation.getGuestPersons().remove(person);
-		
-		reservationRepository.save(reservation);
-		
-		
+		guestPersonRepository.delete(person);
 	}
 	
+	
+	public GuestType isLegal(LocalDate birthDate) {
+		Period period = Period.between(birthDate, LocalDate.now());
+		
+		if(period.getYears() >= 18) {
+			return GuestType.ADULT;
+		}
+		else {
+			return GuestType.CHILD;
+		}
+	}
 }
