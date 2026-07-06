@@ -1,4 +1,4 @@
-package com.plamaka.hotel_reservation_api.Validation;
+package com.plamaka.hotel_reservation_api.validation;
 
 import com.plamaka.hotel_reservation_api.dto.request.ReservationRequestDTO;
 

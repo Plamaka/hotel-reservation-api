@@ -235,8 +235,8 @@ public class ReservationService {
 			ReservationRoom conflict =
 				    reservationRoomRepository.findConflictingReservation(
 				            roomId,
-				            requestDto.getCheckInDate(),
 				            requestDto.getCheckOutDate(),
+				            requestDto.getCheckInDate(),
 				            ReservationStatus.CANCELLED)
 				    .orElse(null);
 

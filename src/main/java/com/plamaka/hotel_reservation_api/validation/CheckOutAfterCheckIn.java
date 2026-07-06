@@ -1,4 +1,4 @@
-package com.plamaka.hotel_reservation_api.Validation;
+package com.plamaka.hotel_reservation_api.validation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

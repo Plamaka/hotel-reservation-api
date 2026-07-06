@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.plamaka.hotel_reservation_api.Validation.CheckOutAfterCheckIn;
 import com.plamaka.hotel_reservation_api.enums.PaymentMethod;
+import com.plamaka.hotel_reservation_api.validation.CheckOutAfterCheckIn;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
