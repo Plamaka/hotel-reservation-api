@@ -3,11 +3,21 @@ package com.plamaka.hotel_reservation_api.dto.request;
 import java.time.LocalDate;
 import java.util.List;
 
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+
 public class UpdateReservationRequestDTO {
+	
+	@FutureOrPresent
 	private LocalDate checkInDate;
 
+	@Future
     private LocalDate checkOutDate;
 
+	@NotBlank
+	@Positive
     private List<Long> roomIds;
 
 	public LocalDate getCheckInDate() {

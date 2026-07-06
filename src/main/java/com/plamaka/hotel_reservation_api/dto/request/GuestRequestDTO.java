@@ -1,15 +1,27 @@
 package com.plamaka.hotel_reservation_api.dto.request;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class GuestRequestDTO {
 	
+	@NotBlank
+	@Size(min=2,max = 25)
 	private String firstName;
 	
+	@NotBlank
+	@Size(min=2,max = 25)
 	private String middleName;
 	
+	@NotBlank
+	@Size(min=2,max = 25)
 	private String lastName;
 	
+	@Email
 	private String email;
 	
+	@NotBlank
 	private String phoneNumber;
 
 	public String getFirstName() {

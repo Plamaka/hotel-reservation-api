@@ -23,6 +23,7 @@ import com.plamaka.hotel_reservation_api.enums.GuestType;
 import com.plamaka.hotel_reservation_api.enums.ReservationStatus;
 import com.plamaka.hotel_reservation_api.enums.RoomStatus;
 import com.plamaka.hotel_reservation_api.exception.ExceededRoomCapacityException;
+import com.plamaka.hotel_reservation_api.exception.GuestIsDeletedException;
 import com.plamaka.hotel_reservation_api.exception.GuestNotFoundException;
 import com.plamaka.hotel_reservation_api.exception.ReservationConflictException;
 import com.plamaka.hotel_reservation_api.exception.ReservationNotFoundException;
@@ -204,6 +205,10 @@ public class ReservationService {
 		Guest guest = guestRepository.findById(requestDto.getGuestId()).orElseThrow(
 				() -> new GuestNotFoundException(requestDto.getGuestId()));
 		
+		if(guest.getIsDeleted().equals(true)) {
+			throw new GuestIsDeletedException(guest.getId());		
+		}
+		
 		List<GuestPerson> gps = new ArrayList<>();
 		List<ReservationRoom> rrs = new ArrayList<>();
 		List<Room> rs = new ArrayList<>();
@@ -214,8 +219,13 @@ public class ReservationService {
 				requestDto.getCheckOutDate(),
 				requestDto.getPaymentMethod());
 
+
+		res.setTotalAmount(0.0);
+		res.setDepositAmount(0.0);
 		res.setGuest(guest);
 
+		double totalAmount = 0;
+		
 		for(var roomId : requestDto.getRoomIds()) {
 			Room room = roomRepository.findById(roomId).orElseThrow(
 					() -> new RoomNotFoundException(roomId));
@@ -237,8 +247,8 @@ public class ReservationService {
 				            conflict.getReservation().getCheckOutDate());
 				}
 			
-			res.setTotalAmount(res.getTotalAmount() + totalSum(
-					requestDto.getCheckInDate(), requestDto.getCheckOutDate(), room));
+				totalAmount += totalSum(
+					requestDto.getCheckInDate(), requestDto.getCheckOutDate(), room);
 			
 			ReservationRoom rr = new ReservationRoom();
 			rr.setReservation(res);
@@ -262,8 +272,8 @@ public class ReservationService {
 
 		exceededRoomCapacity(gps.size() + 1, rs);
 		
-		res.setDepositAmount(res.getTotalAmount() * 0.5);
-		
+		res.setDepositAmount(totalAmount * 0.5);
+		res.setTotalAmount(totalAmount);
 		res.setReservationRoom(rrs);
 		res.setGuestPersons(gps);
 		
@@ -327,10 +337,13 @@ public class ReservationService {
 		Reservation res = reservationRepository.findById(id).orElseThrow(
 				() -> new ReservationNotFoundException(id));
 		
-		
+		res.setTotalAmount(0.0);
+		res.setDepositAmount(0.0);
 		res.setCheckInDate(requestDto.getCheckInDate());
 		res.setCheckOutDate(requestDto.getCheckOutDate());
 		res.getReservationRoom().clear();
+		
+		double totalAmount = 0;
 		
 		List<ReservationRoom> rrsOld = res.getReservationRoom();
 			
@@ -342,6 +355,10 @@ public class ReservationService {
 			
 			rs.add(room);
 			
+			System.out.println("Room: " + roomId);
+			System.out.println("CheckIn: " + requestDto.getCheckInDate());
+			System.out.println("CheckOut: " + requestDto.getCheckOutDate());
+			
 			ReservationRoom conflict =
 				    reservationRoomRepository.findConflictingReservation(
 				            roomId,
@@ -349,6 +366,8 @@ public class ReservationService {
 				            requestDto.getCheckOutDate(),
 				            ReservationStatus.CANCELLED)
 				    .orElse(null);
+			
+			System.out.println("Conflict found: " + conflict);
 
 				if (conflict != null) {
 				    throw new ReservationConflictException(
@@ -357,8 +376,8 @@ public class ReservationService {
 				            conflict.getReservation().getCheckOutDate());
 				}
 			
-			res.setTotalAmount(res.getTotalAmount() + totalSum(
-					requestDto.getCheckInDate(), requestDto.getCheckOutDate(), room));
+				totalAmount += totalSum(
+					requestDto.getCheckInDate(), requestDto.getCheckOutDate(), room);
 			
 			ReservationRoom rr = new ReservationRoom();
 			rr.setReservation(res);
@@ -370,6 +389,8 @@ public class ReservationService {
 		exceededRoomCapacity(gps.size() + 1, rs);
 		
 		res.setReservationRoom(rrsOld);
+		res.setDepositAmount(totalAmount * 0.5);
+		res.setTotalAmount(totalAmount);
 		Reservation saved = reservationRepository.save(res);
 		
 		GetReservationResponseDTO dto = new GetReservationResponseDTO();

@@ -2,15 +2,24 @@ package com.plamaka.hotel_reservation_api.dto.request;
 
 import com.plamaka.hotel_reservation_api.enums.RoomStatus;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class RoomRequestDTO {
+	
+	@NotBlank
 	private String roomNumber;
 	
+	@NotNull
 	private Integer floor;
 
+	@NotNull
 	private RoomStatus roomstatus;
 
+	@NotNull
 	private Long roomTypeId;
 	
+	@NotNull
 	private Boolean balcony;
 
 	public String getRoomNumber() {

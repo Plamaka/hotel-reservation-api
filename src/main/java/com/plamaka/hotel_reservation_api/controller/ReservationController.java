@@ -17,6 +17,8 @@ import com.plamaka.hotel_reservation_api.dto.response.ReservationResponseDTO;
 import com.plamaka.hotel_reservation_api.enums.ReservationStatus;
 import com.plamaka.hotel_reservation_api.service.ReservationService;
 
+import jakarta.validation.Valid;
+
 @RestController
 public class ReservationController {
 	
@@ -31,7 +33,7 @@ public class ReservationController {
 		return reservationService.getAllPendingReservation();
 	}
 	
-	@GetMapping(path = "/reservations/reservation-status")
+	@GetMapping(path = "/reservations/reservation-status/{status}")
 	public List<GetReservationResponseDTO> getByStatus(@PathVariable ReservationStatus status){
 		return reservationService.getReservationByStatus(status);
 	}
@@ -41,13 +43,13 @@ public class ReservationController {
 		return reservationService.getReservationById(id);
 	}
 	
-	@PostMapping(path = "/reservations/")
-	public ReservationResponseDTO getbyId(@RequestBody ReservationRequestDTO request){
+	@PostMapping(path = "/reservations")
+	public ReservationResponseDTO getbyId(@Valid @RequestBody ReservationRequestDTO request){
 		return reservationService.createReservation(request);
 	}
 	
 	@PutMapping(path = "/reservations/{id}")
-	public GetReservationResponseDTO updateReservation(@PathVariable Long id, UpdateReservationRequestDTO request){
+	public GetReservationResponseDTO updateReservation(@PathVariable Long id,@Valid @RequestBody UpdateReservationRequestDTO request){
 		return reservationService.updateReservation(id, request);
 	}
 

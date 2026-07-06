@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
 	}
 	
 	@ExceptionHandler(GuestNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleRoomNotFound(
+	public ResponseEntity<ErrorResponse> handleGuestNotFound(
 			GuestNotFoundException ex,
 	        HttpServletRequest request){
 
@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
 	}
 	
 	@ExceptionHandler(GuestPersonNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleRoomNotFound(
+	public ResponseEntity<ErrorResponse> handleGuestPersonNotFound(
 			GuestPersonNotFoundException ex,
 	        HttpServletRequest request){
 
@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
 	}
 	//RoomHasReservationsException
 	@ExceptionHandler(RoomTypeNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleRoomNotFound(
+	public ResponseEntity<ErrorResponse> handleRoomTypeNotFound(
 			RoomTypeNotFoundException ex,
 	        HttpServletRequest request){
 
@@ -95,7 +95,7 @@ public class GlobalExceptionHandler {
 	}
 	
 	@ExceptionHandler(ReservationNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleRoomNotFound(
+	public ResponseEntity<ErrorResponse> handleReservationNotFound(
 			ReservationNotFoundException ex,
 	        HttpServletRequest request){
 
@@ -111,7 +111,7 @@ public class GlobalExceptionHandler {
 	}
 	
 	@ExceptionHandler(RoomHasReservationsException.class)
-	public ResponseEntity<ErrorResponse> handleRoomNotFound(
+	public ResponseEntity<ErrorResponse> handleRoomHasReservations(
 			RoomHasReservationsException ex,
 	        HttpServletRequest request){
 
@@ -127,7 +127,7 @@ public class GlobalExceptionHandler {
 	}
 	
 	@ExceptionHandler(ReservationConflictException.class)
-	public ResponseEntity<ErrorResponse> handleRoomNotFound(
+	public ResponseEntity<ErrorResponse> handleReservationConflict(
 			ReservationConflictException ex,
 	        HttpServletRequest request){
 
@@ -143,7 +143,7 @@ public class GlobalExceptionHandler {
 	}
 	
 	@ExceptionHandler(ExceededRoomCapacityException.class)
-	public ResponseEntity<ErrorResponse> handleRoomNotFound(
+	public ResponseEntity<ErrorResponse> handleExceededRoomCapacity(
 			ExceededRoomCapacityException ex,
 	        HttpServletRequest request){
 
@@ -156,5 +156,21 @@ public class GlobalExceptionHandler {
 	    error.setPath(request.getRequestURI());
 	    
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+	}
+	
+	@ExceptionHandler(GuestIsDeletedException.class)
+	public ResponseEntity<ErrorResponse> handleGuestIsDeleted(
+			GuestIsDeletedException ex,
+	        HttpServletRequest request){
+
+	    ErrorResponse error = new ErrorResponse();
+
+	    error.setTimestamp(LocalDateTime.now());
+	    error.setStatus(HttpStatus.NOT_FOUND.value());
+	    error.setError(HttpStatus.NOT_FOUND.name());
+	    error.setMessage(ex.getMessage());
+	    error.setPath(request.getRequestURI());
+	    
+	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
 	}
 }

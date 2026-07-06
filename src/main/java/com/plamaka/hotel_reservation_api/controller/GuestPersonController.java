@@ -11,6 +11,8 @@ import com.plamaka.hotel_reservation_api.dto.request.GuestPersonRequeastDTO;
 import com.plamaka.hotel_reservation_api.dto.response.GuestPersonResponseDTO;
 import com.plamaka.hotel_reservation_api.service.GuestPersonService;
 
+import jakarta.validation.Valid;
+
 @RestController
 public class GuestPersonController {
 	
@@ -21,12 +23,12 @@ public class GuestPersonController {
 	}
 	
 	@PostMapping(path = "/guest-persons")
-	public GuestPersonResponseDTO addPersonGuest(@RequestBody GuestPersonRequeastDTO request) {
+	public GuestPersonResponseDTO addPersonGuest(@Valid @RequestBody GuestPersonRequeastDTO request) {
 		return guestPersonService.createPersonGuest(request);
 	}
 	
 	@PutMapping(path = "/guest-persons/{id}")
-	public GuestPersonResponseDTO addPersonGuest(@PathVariable Long id, @RequestBody GuestPersonRequeastDTO request ) {
+	public GuestPersonResponseDTO addPersonGuest(@PathVariable Long id, @Valid @RequestBody GuestPersonRequeastDTO request ) {
 		return guestPersonService.updatePersonGuest(id, request);
 	}
 	

@@ -2,12 +2,10 @@ package com.plamaka.hotel_reservation_api.dto.request;
 
 import java.time.LocalDate;
 
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 
-public class GuestPersonRequeastDTO {
-
+public class GuestPersonReservationRequeastDTO {
 	@Size(min=2,max = 25)
 	private String firstName;
 
@@ -16,17 +14,6 @@ public class GuestPersonRequeastDTO {
 
 	@PastOrPresent
     private LocalDate birthDate;
-    
-	@NotNull
-    private Long reservationId;
-
-	public Long getReservationId() {
-		return reservationId;
-	}
-
-	public void setReservationId(Long reservationId) {
-		this.reservationId = reservationId;
-	}
 
 	public String getFirstName() {
 		return firstName;
@@ -51,4 +38,6 @@ public class GuestPersonRequeastDTO {
 	public void setBirthDate(LocalDate birthDate) {
 		this.birthDate = birthDate;
 	}
+	
+	
 }

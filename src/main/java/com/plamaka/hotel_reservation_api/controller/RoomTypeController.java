@@ -13,6 +13,8 @@ import com.plamaka.hotel_reservation_api.dto.request.RoomTypeRequestDTO;
 import com.plamaka.hotel_reservation_api.dto.response.RoomTypeResponseDTO;
 import com.plamaka.hotel_reservation_api.service.RoomTypeService;
 
+import jakarta.validation.Valid;
+
 @RestController
 public class RoomTypeController {
 	
@@ -28,12 +30,12 @@ public class RoomTypeController {
 	}
 	
 	@PostMapping(path = "/room-type")
-	public RoomTypeResponseDTO createRoomType(@RequestBody RoomTypeRequestDTO request) {
+	public RoomTypeResponseDTO createRoomType(@Valid @RequestBody RoomTypeRequestDTO request) {
 		return roomTypeService.createRoomType(request);
 	}
 	
 	@PutMapping(path = "/room-type/{id}")
-	public RoomTypeResponseDTO updateRoomType(@PathVariable Long id ,@RequestBody RoomTypeRequestDTO request) {
+	public RoomTypeResponseDTO updateRoomType(@PathVariable Long id ,@Valid @RequestBody RoomTypeRequestDTO request) {
 		return roomTypeService.updateRoomType(id, request);
 	}
 }

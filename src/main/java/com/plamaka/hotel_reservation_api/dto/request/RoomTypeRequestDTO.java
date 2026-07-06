@@ -1,13 +1,22 @@
 package com.plamaka.hotel_reservation_api.dto.request;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class RoomTypeRequestDTO {
 
+	@Size(min=5,max = 30)
 	private String typeName;
 	
+	@Max(8)
 	private Integer capacity;
 	
+	@DecimalMin("35.00")
 	private Double pricePerNight;
 	
+	@NotNull
 	private Boolean petsAllowed;
 
 	public String getTypeName() {

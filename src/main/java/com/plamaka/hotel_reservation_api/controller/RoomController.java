@@ -15,6 +15,8 @@ import com.plamaka.hotel_reservation_api.dto.response.RoomResponseDTO;
 import com.plamaka.hotel_reservation_api.enums.RoomStatus;
 import com.plamaka.hotel_reservation_api.service.RoomService;
 
+import jakarta.validation.Valid;
+
 @RestController
 public class RoomController {
 	
@@ -29,32 +31,32 @@ public class RoomController {
 		return roomService.findAvailableRooms();
 	}
 	
-	@GetMapping(path = "/rooms/room-status")
+	@GetMapping(path = "/rooms/status/{status}")
 	public List<RoomResponseDTO> getRoomsByStatus(@PathVariable RoomStatus status){
 		return roomService.findRoomsByStatus(status);
 	}
 	
-	@GetMapping(path = "/rooms/floor")
+	@GetMapping(path = "/rooms/floor/{floor}")
 	public List<RoomResponseDTO> getRoomsOnFloor(@PathVariable Integer floor){
-		return roomService.findRoomsByFloor( floor);
+		return roomService.findRoomsByFloor(floor);
 	}
 	
-	@GetMapping(path = "/rooms/room-type")
+	@GetMapping(path = "/rooms/type-name/{typeName}")
 	public List<RoomResponseDTO> getRoomsByType(@PathVariable String typeName){
 		return roomService.findRoomsByRoomType(typeName);
 	}
 	
 	@PostMapping(path = "/rooms")
-	public RoomResponseDTO postRoom(@RequestBody RoomRequestDTO request){
+	public RoomResponseDTO postRoom(@Valid @RequestBody RoomRequestDTO request){
 		return roomService.addRoom(request);
 	}
 	
 	@PutMapping(path = "/rooms/{id}")
-	public RoomResponseDTO updateRoom(@PathVariable Long id, @RequestBody RoomRequestDTO request){
+	public RoomResponseDTO updateRoom(@PathVariable Long id, @Valid @RequestBody RoomRequestDTO request){
 		return roomService.updateRoom(id, request);
 	}
 	
-	@DeleteMapping(path = "/rooms")
+	@DeleteMapping(path = "/rooms/{id}")
 	public void deleteRoom(@PathVariable Long id){
 		roomService.deleteRoom(id);
 	}
