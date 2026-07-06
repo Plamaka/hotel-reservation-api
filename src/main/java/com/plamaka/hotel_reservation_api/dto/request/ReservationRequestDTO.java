@@ -1,21 +1,36 @@
 package com.plamaka.hotel_reservation_api.dto.request;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.plamaka.hotel_reservation_api.Validation.CheckOutAfterCheckIn;
 import com.plamaka.hotel_reservation_api.enums.PaymentMethod;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotNull;
+
+@CheckOutAfterCheckIn
 public class ReservationRequestDTO {
+	
+	@NotNull
 	private Long guestId;
 	
+	@FutureOrPresent
 	private LocalDate checkInDate;
 	
+	@Future
 	private LocalDate checkOutDate;
 	
+	@NotNull
 	private List<Long> roomIds;
 	
-	private List<GuestPersonRequeastDTO> guestPersons;
+	@Valid
+	private List<GuestPersonReservationRequeastDTO> guestPersons = new ArrayList<>();
 	
+	@NotNull
 	private PaymentMethod paymentMethod;
 
 	public Long getGuestId() {
@@ -50,11 +65,11 @@ public class ReservationRequestDTO {
 		this.roomIds = roomIds;
 	}
 
-	public List<GuestPersonRequeastDTO> getGuestPersons() {
+	public List<GuestPersonReservationRequeastDTO> getGuestPersons() {
 		return guestPersons;
 	}
 
-	public void setGuestPersons(List<GuestPersonRequeastDTO> guestPersons) {
+	public void setGuestPersons(List<GuestPersonReservationRequeastDTO> guestPersons) {
 		this.guestPersons = guestPersons;
 	}
 
