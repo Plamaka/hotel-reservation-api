@@ -355,19 +355,13 @@ public class ReservationService {
 			
 			rs.add(room);
 			
-			System.out.println("Room: " + roomId);
-			System.out.println("CheckIn: " + requestDto.getCheckInDate());
-			System.out.println("CheckOut: " + requestDto.getCheckOutDate());
-			
 			ReservationRoom conflict =
 				    reservationRoomRepository.findConflictingReservation(
 				            roomId,
-				            requestDto.getCheckInDate(),
 				            requestDto.getCheckOutDate(),
+				            requestDto.getCheckInDate(),
 				            ReservationStatus.CANCELLED)
 				    .orElse(null);
-			
-			System.out.println("Conflict found: " + conflict);
 
 				if (conflict != null) {
 				    throw new ReservationConflictException(
