@@ -1,5 +1,7 @@
 package com.plamaka.hotel_reservation_api.dto.response;
 
+import java.math.BigDecimal;
+
 import com.plamaka.hotel_reservation_api.enums.RoomStatus;
 
 public class RoomResponseDTO {
@@ -16,7 +18,7 @@ public class RoomResponseDTO {
 	
 	private Integer capacity;
 	
-	private Double pricePerNight;
+	private BigDecimal pricePerNight;
 	
 	private Boolean balcony;
 	
@@ -38,11 +40,11 @@ public class RoomResponseDTO {
 		this.capacity = capacity;
 	}
 
-	public Double getPricePerNight() {
+	public BigDecimal getPricePerNight() {
 		return pricePerNight;
 	}
 
-	public void setPricePerNight(Double pricePerNight) {
+	public void setPricePerNight(BigDecimal pricePerNight) {
 		this.pricePerNight = pricePerNight;
 	}
 

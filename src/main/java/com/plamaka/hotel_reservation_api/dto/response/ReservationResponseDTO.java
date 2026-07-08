@@ -1,8 +1,11 @@
 package com.plamaka.hotel_reservation_api.dto.response;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.plamaka.hotel_reservation_api.entity.GuestPerson;
 import com.plamaka.hotel_reservation_api.enums.PaymentMethod;
 import com.plamaka.hotel_reservation_api.enums.ReservationStatus;
 
@@ -20,13 +23,13 @@ public class ReservationResponseDTO {
 	
 	private List<RoomReservationResponseDTO> rooms;
 	
-	private List<GuestPersonResponseDTO> guestPersons;
+	private List<GuestPersonResponseDTO> guestPersons = new ArrayList<>();
 	
 	private PaymentMethod paymentMethod;
 	
-	private Double depositAmount;
+	private BigDecimal depositAmount;
 	
-	private Double totalAmount;
+	private BigDecimal totalAmount;
 
 	public GuestResponseDTO getGuest() {
 		return guest;
@@ -44,11 +47,17 @@ public class ReservationResponseDTO {
 		this.guestPersons = guestPersons;
 	}
 
-	public Double getTotalAmount() {
+	public void addGuests(List<GuestPerson> list) {
+		for (GuestPerson guestPerson : list) {
+			guestPersons.add(new GuestPersonResponseDTO(guestPerson));
+		}
+	}
+
+	public BigDecimal getTotalAmount() {
 		return totalAmount;
 	}
 
-	public void setTotalAmount(Double totalAmount) {
+	public void setTotalAmount(BigDecimal totalAmount) {
 		this.totalAmount = totalAmount;
 	}
 
@@ -100,11 +109,11 @@ public class ReservationResponseDTO {
 		this.paymentMethod = paymentMethod;
 	}
 
-	public Double getDepositAmount() {
+	public BigDecimal getDepositAmount() {
 		return depositAmount;
 	}
 
-	public void setDepositAmount(Double depositAmount) {
+	public void setDepositAmount(BigDecimal depositAmount) {
 		this.depositAmount = depositAmount;
 	}
 	

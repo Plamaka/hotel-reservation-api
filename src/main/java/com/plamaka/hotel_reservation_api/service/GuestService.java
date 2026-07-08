@@ -29,7 +29,7 @@ public class GuestService {
 			GuestResponseDTO dto = new GuestResponseDTO();
 			
 			dto.setId(guest.getId());
-			dto.setFullName(guest.toStringFullName());
+			dto.setFullName(guest.getFullName());
 			dto.setEmail(guest.getEmail());
 			
 			respons.add(dto);
@@ -39,24 +39,11 @@ public class GuestService {
 	}
 	
 	public GuestResponseDTO createGuest(GuestRequestDTO requestDto) {
-		Guest guest = new Guest(
-				requestDto.getFirstName(),
-				requestDto.getMiddleName(),
-				requestDto.getLastName(),
-				requestDto.getEmail(),
-				requestDto.getPhoneNumber());
-		
+		Guest guest = new Guest(requestDto);
 		guest.setIsDeleted(false);
-		
-		Guest saved = guestRepository.save(guest); 
-		
-		GuestResponseDTO dto = new GuestResponseDTO();
-		
-		dto.setId(saved.getId());
-		dto.setFullName(saved.toStringFullName());
-		dto.setEmail(saved.getEmail());
-		
-		return dto;
+
+		Guest saved = guestRepository.save(guest);
+		return new GuestResponseDTO(saved);
 	}
 	
 	public GuestResponseDTO updateGuest(Long id, GuestRequestDTO requestDto) {
@@ -74,7 +61,7 @@ public class GuestService {
 		GuestResponseDTO response = new GuestResponseDTO();
 		
 		response.setId(saved.getId());
-		response.setFullName(saved.toStringFullName());
+		response.setFullName(saved.getFullName());
 		response.setEmail(saved.getEmail());
 		
 		return response;

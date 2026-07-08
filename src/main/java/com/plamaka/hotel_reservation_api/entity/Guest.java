@@ -2,11 +2,14 @@ package com.plamaka.hotel_reservation_api.entity;
 
 import java.util.List;
 
+import com.plamaka.hotel_reservation_api.dto.request.GuestRequestDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -32,6 +35,10 @@ public class Guest {
 	
 	private Boolean isDeleted;
 	
+	@OneToOne
+	@JoinColumn(name="user_id")
+	private User user;
+	
 
 	public Guest() {
 	}
@@ -43,6 +50,15 @@ public class Guest {
 		this.lastName = lastName;
 		this.email = email;
 		this.phoneNumber = phoneNumber;
+	}
+
+	public Guest(GuestRequestDTO dto) {
+		super();
+		this.firstName = dto.getFirstName();
+		this.middleName = dto.getMiddleName();
+		this.lastName = dto.getLastName();
+		this.email = dto.getEmail();
+		this.phoneNumber = dto.getPhoneNumber();
 	}
 
 	public Long getId() {
@@ -109,7 +125,7 @@ public class Guest {
 		this.isDeleted = isDeleted;
 	}
 
-	public String toStringFullName() {
+	public String getFullName() {
 		return firstName + " " + middleName + " " + lastName;
 	}	
 	

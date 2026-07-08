@@ -1,5 +1,6 @@
 package com.plamaka.hotel_reservation_api.entity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -21,7 +22,7 @@ public class RoomType {
 	
 	private Integer capacity;
 	
-	private Double pricePerNight;
+	private BigDecimal pricePerNight;
 	
 	private Boolean petsAllowed;
 	
@@ -31,7 +32,7 @@ public class RoomType {
 	public RoomType() {
 	}
 
-	public RoomType(String typeName, Integer capacity, Double pricePerNight, Boolean petsAllowed) {
+	public RoomType(String typeName, Integer capacity, BigDecimal pricePerNight, Boolean petsAllowed) {
 		super();
 		this.typeName = typeName;
 		this.capacity = capacity;
@@ -63,11 +64,11 @@ public class RoomType {
 		this.capacity = capacity;
 	}
 
-	public Double getPricePerNight() {
+	public BigDecimal getPricePerNight() {
 		return pricePerNight;
 	}
 
-	public void setPricePerNight(Double pricePerNight) {
+	public void setPricePerNight(BigDecimal pricePerNight) {
 		this.pricePerNight = pricePerNight;
 	}
 

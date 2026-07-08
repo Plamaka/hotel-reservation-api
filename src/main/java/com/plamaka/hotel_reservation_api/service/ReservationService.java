@@ -1,5 +1,6 @@
 package com.plamaka.hotel_reservation_api.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -86,7 +87,7 @@ public class ReservationService {
 			dto.setId(res.getId());
 			dto.setStatus(res.getStatus());
 			dto.setGuestId(res.getGuest().getId());
-			dto.setGuestFullName(res.getGuest().toStringFullName());
+			dto.setGuestFullName(res.getGuest().getFullName());
 			dto.setGuestPhoneNumber(res.getGuest().getPhoneNumber());
 			dto.setGuestPerson(res.getGuestPersons().size());
 			dto.setRooms(rrrDTOs);
@@ -130,7 +131,7 @@ public class ReservationService {
 			dto.setId(res.getId());
 			dto.setStatus(res.getStatus());
 			dto.setGuestId(res.getGuest().getId());
-			dto.setGuestFullName(res.getGuest().toStringFullName());
+			dto.setGuestFullName(res.getGuest().getFullName());
 			dto.setGuestPhoneNumber(res.getGuest().getPhoneNumber());
 			dto.setGuestPerson(res.getGuestPersons().size());
 			dto.setRooms(rrrDTOs);
@@ -153,21 +154,13 @@ public class ReservationService {
 		Guest guest = reservations.getGuest();
 		GuestResponseDTO guestResponse = new GuestResponseDTO();
 		guestResponse.setId(guest.getId());
-		guestResponse.setFullName(guest.toStringFullName());
+		guestResponse.setFullName(guest.getFullName());
 		guestResponse.setEmail(guest.getEmail());
 		
 		List<GuestPerson> gps = reservations.getGuestPersons();
 		List<GuestPersonResponseDTO> gprDTOs  = new ArrayList<>();
-		for(var gpr : gps) {
-			GuestPersonResponseDTO gprDto = new GuestPersonResponseDTO();
-			
-			gprDto.setId(gpr.getId());
-			gprDto.setFullName(gpr.toStringFullName());
-			gprDto.setGuestType(gpr.getGuestType());
-			
-			gprDTOs.add(gprDto);
-		}
-		
+		populateGuestPersonToDTO(gps, gprDTOs);
+
 		List<ReservationRoom> rs = reservations.getReservationRoom();
 		List<RoomReservationResponseDTO> rrrDTOs  = new ArrayList<>();
 		for(var r : rs) {
@@ -201,149 +194,146 @@ public class ReservationService {
 	
 	@Transactional
 	public ReservationResponseDTO createReservation(ReservationRequestDTO requestDto) {
-		
 		Guest guest = guestRepository.findById(requestDto.getGuestId()).orElseThrow(
 				() -> new GuestNotFoundException(requestDto.getGuestId()));
-		
-		if(guest.getIsDeleted().equals(true)) {
-			throw new GuestIsDeletedException(guest.getId());		
+
+		if (guest.getIsDeleted().equals(true)) {
+			throw new GuestIsDeletedException(guest.getId());
 		}
-		
+
 		List<GuestPerson> gps = new ArrayList<>();
 		List<ReservationRoom> rrs = new ArrayList<>();
 		List<Room> rs = new ArrayList<>();
-		
+
 		Reservation res = new Reservation(
 				ReservationStatus.PENDING,
 				requestDto.getCheckInDate(),
 				requestDto.getCheckOutDate(),
 				requestDto.getPaymentMethod());
 
-
-		res.setTotalAmount(0.0);
-		res.setDepositAmount(0.0);
 		res.setGuest(guest);
 
-		double totalAmount = 0;
-		
-		for(var roomId : requestDto.getRoomIds()) {
+		BigDecimal totalAmount = BigDecimal.ZERO;
+
+		for (var roomId : requestDto.getRoomIds()) {
 			Room room = roomRepository.findById(roomId).orElseThrow(
 					() -> new RoomNotFoundException(roomId));
-			
-			rs.add(room);
-			
-			ReservationRoom conflict =
-				    reservationRoomRepository.findConflictingReservation(
-				            roomId,
-				            requestDto.getCheckOutDate(),
-				            requestDto.getCheckInDate(),
-				            ReservationStatus.CANCELLED)
-				    .orElse(null);
 
-				if (conflict != null) {
-				    throw new ReservationConflictException(
-				            roomId,
-				            conflict.getReservation().getCheckInDate(),
-				            conflict.getReservation().getCheckOutDate());
-				}
-			
-				totalAmount += totalSum(
-					requestDto.getCheckInDate(), requestDto.getCheckOutDate(), room);
-			
+			rs.add(room);
+
+			ReservationRoom conflict =
+					reservationRoomRepository.findConflictingReservation(
+									roomId,
+									requestDto.getCheckOutDate(),
+									requestDto.getCheckInDate(),
+									ReservationStatus.CANCELLED)
+							.orElse(null);
+
+			if (conflict != null) {
+				throw new ReservationConflictException(
+						roomId,
+						conflict.getReservation().getCheckInDate(),
+						conflict.getReservation().getCheckOutDate());
+			}
+
+			totalAmount = totalAmount.add(totalSum(
+					requestDto.getCheckInDate(), requestDto.getCheckOutDate(), room));
+
 			ReservationRoom rr = new ReservationRoom();
 			rr.setReservation(res);
 			rr.setRoom(room);
-			
+
 			rrs.add(rr);
-		}		
-		
-		
-		for(var person : requestDto.getGuestPersons()) {
+		}
+
+
+		for (var person : requestDto.getGuestPersons()) {
 			GuestPerson gp = new GuestPerson();
-			
+
 			gp.setFirstName(person.getFirstName());
 			gp.setLastName(person.getLastName());
 			gp.setBirthDate(person.getBirthDate());
 			gp.setGuestType(isLegal(person.getBirthDate()));
 			gp.setReservation(res);
-			
+
 			gps.add(gp);
 		}
 
 		exceededRoomCapacity(gps.size() + 1, rs);
-		
-		res.setDepositAmount(totalAmount * 0.5);
+
+		res.setDepositAmount(totalAmount);
 		res.setTotalAmount(totalAmount);
 		res.setReservationRoom(rrs);
 		res.setGuestPersons(gps);
-		
+
 		Reservation saved = reservationRepository.save(res);
-		
-		for(var  roomRes : rrs) {
+
+		for (var roomRes : rrs) {
 			roomRes.setReservation(saved);
 			reservationRoomRepository.save(roomRes);
 		}
-		
-		for(var guestPerson : gps) {
+
+		for (var guestPerson : gps) {
 			guestPerson.setReservation(saved);
 			guestPersonRepository.save(guestPerson);
 		}
-		
+
 		GuestResponseDTO guestResponse = new GuestResponseDTO();
 		guestResponse.setId(guest.getId());
-		guestResponse.setFullName(guest.toStringFullName());
+		guestResponse.setFullName(guest.getFullName());
 		guestResponse.setEmail(guest.getEmail());
-		
-		List<GuestPersonResponseDTO> gprDTOs  = new ArrayList<>();
-		for(var gpr : gps) {
-			GuestPersonResponseDTO gprDto = new GuestPersonResponseDTO();
-			
-			gprDto.setId(gpr.getId());
-			gprDto.setFullName(gpr.toStringFullName());
-			gprDto.setGuestType(gpr.getGuestType());
-			
-			gprDTOs.add(gprDto);
+
+		List<GuestPersonResponseDTO> gprDTOs = new ArrayList<>();
+
+		List<RoomReservationResponseDTO> rrrDTOs = new ArrayList<>();
+		for (var room : rs) {
+			RoomReservationResponseDTO dto = new RoomReservationResponseDTO();
+
+			dto.setId(room.getId());
+			dto.setTypeName(room.getRoomType().getTypeName());
+			dto.setRoomNumber(room.getRoomNumber());
+			dto.setFloor(room.getFloor());
+
+			rrrDTOs.add(dto);
 		}
-		
-		List<RoomReservationResponseDTO> rrrDTOs  = new ArrayList<>();
-		for(var room : rs) {
-			RoomReservationResponseDTO rrrDto = new RoomReservationResponseDTO();
-			
-			rrrDto.setId(room.getId());
-			rrrDto.setTypeName(room.getRoomType().getTypeName());
-			rrrDto.setRoomNumber(room.getRoomNumber());
-			rrrDto.setFloor(room.getFloor());
-			
-			rrrDTOs.add(rrrDto);
-		}
-		
-		
+
+
 		ReservationResponseDTO response = new ReservationResponseDTO();
 		response.setId(saved.getId());
 		response.setStatus(saved.getStatus());
 		response.setGuest(guestResponse);
-		response.setGuestPersons(gprDTOs);
+		response.addGuests(gps);
 		response.setRooms(rrrDTOs);
 		response.setCheckInDate(saved.getCheckInDate());
 		response.setCheckOutDate(saved.getCheckOutDate());
 		response.setPaymentMethod(saved.getPaymentMethod());
 		response.setDepositAmount(saved.getDepositAmount());
 		response.setTotalAmount(saved.getTotalAmount());
-		
+
 		return response;
 	}
-	
+
+	private static void populateGuestPersonToDTO(List<GuestPerson> gps, List<GuestPersonResponseDTO> gprDTOs) {
+		for (var gpr : gps) {
+			GuestPersonResponseDTO gprDto = new GuestPersonResponseDTO();
+
+			gprDto.setId(gpr.getId());
+			gprDto.setFullName(gpr.toStringFullName());
+			gprDto.setGuestType(gpr.getGuestType());
+
+			gprDTOs.add(gprDto);
+		}
+	}
+
 	public GetReservationResponseDTO updateReservation(Long id, UpdateReservationRequestDTO requestDto) {
 		Reservation res = reservationRepository.findById(id).orElseThrow(
 				() -> new ReservationNotFoundException(id));
 		
-		res.setTotalAmount(0.0);
-		res.setDepositAmount(0.0);
 		res.setCheckInDate(requestDto.getCheckInDate());
 		res.setCheckOutDate(requestDto.getCheckOutDate());
 		res.getReservationRoom().clear();
 		
-		double totalAmount = 0;
+		BigDecimal totalAmount = BigDecimal.ZERO;
 		
 		List<ReservationRoom> rrsOld = res.getReservationRoom();
 			
@@ -370,8 +360,8 @@ public class ReservationService {
 				            conflict.getReservation().getCheckOutDate());
 				}
 			
-				totalAmount += totalSum(
-					requestDto.getCheckInDate(), requestDto.getCheckOutDate(), room);
+				totalAmount = totalAmount.add(totalSum(
+						requestDto.getCheckInDate(), requestDto.getCheckOutDate(), room));
 			
 			ReservationRoom rr = new ReservationRoom();
 			rr.setReservation(res);
@@ -382,8 +372,10 @@ public class ReservationService {
 		
 		exceededRoomCapacity(gps.size() + 1, rs);
 		
+		
+		
 		res.setReservationRoom(rrsOld);
-		res.setDepositAmount(totalAmount * 0.5);
+		res.setDepositAmount(totalAmount);
 		res.setTotalAmount(totalAmount);
 		Reservation saved = reservationRepository.save(res);
 		
@@ -409,7 +401,7 @@ public class ReservationService {
 		dto.setId(saved.getId());
 		dto.setStatus(saved.getStatus());
 		dto.setGuestId(saved.getGuest().getId());
-		dto.setGuestFullName(saved.getGuest().toStringFullName());
+		dto.setGuestFullName(saved.getGuest().getFullName());
 		dto.setGuestPhoneNumber(saved.getGuest().getPhoneNumber());
 		dto.setGuestPerson(saved.getGuestPersons().size());
 		dto.setRooms(rrrDTOs);
@@ -502,12 +494,14 @@ public class ReservationService {
 
 	}
 	
-	public Double totalSum(LocalDate checkIn, LocalDate checkOut, Room room) {
-		double total = 0;
+	public BigDecimal totalSum(LocalDate checkIn, LocalDate checkOut, Room room) {
+		BigDecimal total = BigDecimal.ZERO;
 		
 		Period period = Period.between(checkIn, checkOut); 
 		
-		total = room.getRoomType().getPricePerNight() * period.getDays();
+		BigDecimal times = BigDecimal.valueOf(period.getDays());
+		
+		total = room.getRoomType().getPricePerNight().multiply(times);
 		
 		return total;
 	}

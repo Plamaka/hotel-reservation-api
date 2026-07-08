@@ -1,5 +1,7 @@
 package com.plamaka.hotel_reservation_api.dto.request;
 
+import java.math.BigDecimal;
+
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +16,7 @@ public class RoomTypeRequestDTO {
 	private Integer capacity;
 	
 	@DecimalMin("35.00")
-	private Double pricePerNight;
+	private BigDecimal pricePerNight;
 	
 	@NotNull
 	private Boolean petsAllowed;
@@ -35,11 +37,11 @@ public class RoomTypeRequestDTO {
 		this.capacity = capacity;
 	}
 
-	public Double getPricePerNight() {
+	public BigDecimal getPricePerNight() {
 		return pricePerNight;
 	}
 
-	public void setPricePerNight(Double pricePerNight) {
+	public void setPricePerNight(BigDecimal pricePerNight) {
 		this.pricePerNight = pricePerNight;
 	}
 

@@ -2,6 +2,10 @@ package com.plamaka.hotel_reservation_api.exception;
 
 import java.time.LocalDate;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 public class ReservationConflictException extends RuntimeException{
 	private static final long serialVersionUID = 1L;
 	

@@ -1,5 +1,6 @@
 package com.plamaka.hotel_reservation_api.dto.response;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,9 +28,9 @@ public class GetReservationResponseDTO {
 	
 	private PaymentMethod paymentMethod;
 	
-	private Double depositAmount;
+	private BigDecimal depositAmount;
 	
-	private Double totalAmount;
+	private BigDecimal totalAmount;
 
 	public Long getId() {
 		return Id;
@@ -111,19 +112,19 @@ public class GetReservationResponseDTO {
 		this.paymentMethod = paymentMethod;
 	}
 
-	public Double getDepositAmount() {
+	public BigDecimal getDepositAmount() {
 		return depositAmount;
 	}
 
-	public void setDepositAmount(Double depositAmount) {
+	public void setDepositAmount(BigDecimal depositAmount) {
 		this.depositAmount = depositAmount;
 	}
 
-	public Double getTotalAmount() {
+	public BigDecimal getTotalAmount() {
 		return totalAmount;
 	}
 
-	public void setTotalAmount(Double totalAmount) {
+	public void setTotalAmount(BigDecimal totalAmount) {
 		this.totalAmount = totalAmount;
 	}
 	

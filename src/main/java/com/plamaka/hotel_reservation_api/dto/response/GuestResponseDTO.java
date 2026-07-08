@@ -1,6 +1,17 @@
 package com.plamaka.hotel_reservation_api.dto.response;
 
+import com.plamaka.hotel_reservation_api.entity.Guest;
+
 public class GuestResponseDTO {
+
+	public GuestResponseDTO() {
+	}
+
+	public GuestResponseDTO(Guest guest) {
+		this.id = guest.getId();
+		this.fullName = guest.getFullName();
+		this.email = guest.getEmail();
+	}
 
 	private Long id;
 	
