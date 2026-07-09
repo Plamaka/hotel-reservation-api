@@ -2,6 +2,7 @@ package com.plamaka.hotel_reservation_api.entity;
 
 import java.util.List;
 
+import com.plamaka.hotel_reservation_api.dto.request.RoomRequestDTO;
 import com.plamaka.hotel_reservation_api.enums.RoomStatus;
 
 import jakarta.persistence.Entity;
@@ -42,12 +43,12 @@ public class Room {
 	public Room() {
 	}
 	
-	public Room(String roomNumber, Integer floor, RoomStatus roomstatus, Boolean balcony) {
+	public Room(RoomRequestDTO requestDto) {
 		super();
-		this.roomNumber = roomNumber;
-		this.floor = floor;
-		this.roomStatus = roomstatus;
-		this.balcony = balcony;
+		this.roomNumber = requestDto.getRoomNumber();
+		this.floor = requestDto.getFloor();
+		this.roomStatus = requestDto.getRoomstatus();
+		this.balcony = requestDto.getBalcony();
 	}
 	
 	public Integer getFloor() {

@@ -2,6 +2,8 @@ package com.plamaka.hotel_reservation_api.entity;
 
 import java.time.LocalDate;
 
+import com.plamaka.hotel_reservation_api.dto.request.GuestPersonRequeastDTO;
+import com.plamaka.hotel_reservation_api.dto.request.GuestPersonReservationRequeastDTO;
 import com.plamaka.hotel_reservation_api.enums.GuestType;
 
 import jakarta.persistence.Entity;
@@ -39,13 +41,21 @@ public class GuestPerson {
     public GuestPerson() {
     }
     
-	public GuestPerson(String firstName, String lastName, LocalDate birthDate) {
+	public GuestPerson(GuestPersonRequeastDTO requestDto) {
 		super();
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.birthDate = birthDate;
+		this.firstName = requestDto.getFirstName();
+		this.lastName = requestDto.getLastName();
+		this.birthDate = requestDto.getBirthDate();
 	}
 
+	public GuestPerson(GuestPersonReservationRequeastDTO requestDto, Reservation res) {
+		super();
+		this.firstName = requestDto.getFirstName();
+		this.lastName = requestDto.getLastName();
+		this.birthDate = requestDto.getBirthDate();
+		this.reservation = res;
+	}
+	
 	public Long getId() {
 		return id;
 	}

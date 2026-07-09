@@ -6,12 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.plamaka.hotel_reservation_api.entity.GuestPerson;
+import com.plamaka.hotel_reservation_api.entity.Reservation;
 import com.plamaka.hotel_reservation_api.enums.PaymentMethod;
 import com.plamaka.hotel_reservation_api.enums.ReservationStatus;
 
 public class ReservationResponseDTO {
 	
-	private Long Id;
+	private Long id;
 	
 	private ReservationStatus status;
 	
@@ -30,6 +31,23 @@ public class ReservationResponseDTO {
 	private BigDecimal depositAmount;
 	
 	private BigDecimal totalAmount;
+	
+	public ReservationResponseDTO(Reservation reservations,
+			GuestResponseDTO guest,
+			List<GuestPersonResponseDTO> persons, 
+			List<RoomReservationResponseDTO> rooms){
+		super();	
+		this.id = reservations.getId();
+		this.status = reservations.getStatus();
+		this.guest = guest;
+		this.checkInDate = reservations.getCheckInDate();
+		this.checkOutDate = reservations.getCheckOutDate();
+		this.rooms = rooms;
+		this.guestPersons = persons;
+		this.paymentMethod = reservations.getPaymentMethod();
+		this.depositAmount = reservations.getDepositAmount();
+		this.totalAmount = reservations.getTotalAmount();
+	}
 
 	public GuestResponseDTO getGuest() {
 		return guest;
@@ -62,11 +80,11 @@ public class ReservationResponseDTO {
 	}
 
 	public Long getId() {
-		return Id;
+		return id;
 	}
 
 	public void setId(Long id) {
-		Id = id;
+		this.id = id;
 	}
 
 	public ReservationStatus getStatus() {
@@ -116,6 +134,4 @@ public class ReservationResponseDTO {
 	public void setDepositAmount(BigDecimal depositAmount) {
 		this.depositAmount = depositAmount;
 	}
-	
-	
 }

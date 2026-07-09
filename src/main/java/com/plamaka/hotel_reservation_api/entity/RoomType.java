@@ -3,6 +3,8 @@ package com.plamaka.hotel_reservation_api.entity;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.plamaka.hotel_reservation_api.dto.request.RoomTypeRequestDTO;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,12 +34,12 @@ public class RoomType {
 	public RoomType() {
 	}
 
-	public RoomType(String typeName, Integer capacity, BigDecimal pricePerNight, Boolean petsAllowed) {
+	public RoomType(RoomTypeRequestDTO typeDto) {
 		super();
-		this.typeName = typeName;
-		this.capacity = capacity;
-		this.pricePerNight = pricePerNight;
-		this.petsAllowed = petsAllowed;
+		this.typeName = typeDto.getTypeName();
+		this.capacity = typeDto.getCapacity();
+		this.pricePerNight = typeDto.getPricePerNight();
+		this.petsAllowed = typeDto.getPetsAllowed();
 	}
 
 	public Long getId() {

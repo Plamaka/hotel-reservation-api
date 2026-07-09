@@ -2,6 +2,7 @@ package com.plamaka.hotel_reservation_api.dto.response;
 
 import java.math.BigDecimal;
 
+import com.plamaka.hotel_reservation_api.entity.Room;
 import com.plamaka.hotel_reservation_api.enums.RoomStatus;
 
 public class RoomResponseDTO {
@@ -23,6 +24,19 @@ public class RoomResponseDTO {
 	private Boolean balcony;
 	
 	private Boolean petsAllowed;
+	
+	public RoomResponseDTO(Room room) {
+		super();
+		this.id = room.getId();
+		this.roomNumber = room.getRoomNumber();
+		this.floor = room.getFloor();
+		this.roomStatus = room.getRoomStatus();
+		this.typeName = room.getRoomType().getTypeName();
+		this.capacity = room.getRoomType().getCapacity();
+		this.pricePerNight = room.getRoomType().getPricePerNight();
+		this.balcony = room.getBalcony();
+		this.petsAllowed = room.getRoomType().getPetsAllowed();
+	}
 
 	public String getTypeName() {
 		return typeName;

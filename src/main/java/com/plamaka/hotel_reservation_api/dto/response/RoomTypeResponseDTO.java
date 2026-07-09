@@ -2,6 +2,8 @@ package com.plamaka.hotel_reservation_api.dto.response;
 
 import java.math.BigDecimal;
 
+import com.plamaka.hotel_reservation_api.entity.RoomType;
+
 public class RoomTypeResponseDTO {
 	
 	private Long id;
@@ -11,6 +13,14 @@ public class RoomTypeResponseDTO {
 	private Integer capacity;
 	
 	private BigDecimal pricePerNight;
+	
+	public RoomTypeResponseDTO(RoomType type) {
+		super();
+		this.id = type.getId();
+		this.typeName = type.getTypeName();
+		this.capacity = type.getCapacity();
+		this.pricePerNight = type.getPricePerNight();
+	}
 
 	public Long getId() {
 		return id;

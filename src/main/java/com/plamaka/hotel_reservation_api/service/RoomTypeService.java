@@ -23,63 +23,39 @@ public class RoomTypeService {
 	public List<RoomTypeResponseDTO> getAllRoomTypes(){
 		 List<RoomType> roomTypes =  roomTypeRepository.findAll();
 		
-		 List<RoomTypeResponseDTO> response = new ArrayList<>();
-		 
-		 for(var type : roomTypes) {
-			 RoomTypeResponseDTO dto = new RoomTypeResponseDTO();
-			 
-			 dto.setId(type.getId());
-			 dto.setTypeName(type.getTypeName());
-			 dto.setCapacity(type.getCapacity());
-			 dto.setPricePerNight(type.getPricePerNight());
-			 
-			 response.add(dto);
-		 }
-		 
+		 List<RoomTypeResponseDTO> response = new ArrayList<>();	 
+		 populateRoomTypeToDTO(roomTypes, response);
 		 return response;
 	}
 	
 	public RoomTypeResponseDTO createRoomType(RoomTypeRequestDTO requestDto) {
-		RoomType type = new RoomType(
-				requestDto.getTypeName(),
-				requestDto.getCapacity(),
-				requestDto.getPricePerNight(),
-				requestDto.getPetsAllowed()
-				);
+		RoomType type = new RoomType(requestDto);			
+		RoomType saved = roomTypeRepository.save(type); 	
 		
-		
-		
-		RoomType saved = roomTypeRepository.save(type); 
-		
-		RoomTypeResponseDTO dto = new RoomTypeResponseDTO();
-		
-		dto.setId(saved.getId());
-		 dto.setTypeName(type.getTypeName());
-		 dto.setCapacity(type.getCapacity());
-		 dto.setPricePerNight(type.getPricePerNight());
-		
-		return dto;
+		return new RoomTypeResponseDTO(saved);		
 	}
 	
 	public RoomTypeResponseDTO updateRoomType(Long id, RoomTypeRequestDTO requestDto) {
 		RoomType type = roomTypeRepository.findById(id).orElseThrow(
 				() -> new RoomTypeNotFoundException(id));
-		
+			
+		setRoomTypeFromDTO(type, requestDto);
+		RoomType saved = roomTypeRepository.save(type);
+	
+		return new RoomTypeResponseDTO(saved);
+	}
+	
+	public static void populateRoomTypeToDTO(List<RoomType> roomTypes, List<RoomTypeResponseDTO> response) {
+		for(var type : roomTypes) {
+			 RoomTypeResponseDTO dto = new RoomTypeResponseDTO(type);
+			 response.add(dto);
+		 }		
+	}
+	
+	public static void setRoomTypeFromDTO(RoomType type, RoomTypeRequestDTO requestDto) {
 		type.setTypeName(requestDto.getTypeName());
 		type.setCapacity(requestDto.getCapacity());
 		type.setPricePerNight(requestDto.getPricePerNight());
 		type.setPetsAllowed(requestDto.getPetsAllowed());
-		
-		RoomType saved = roomTypeRepository.save(type);
-		
-		RoomTypeResponseDTO dto = new RoomTypeResponseDTO();
-		
-		 dto.setId(saved.getId());
-		 dto.setTypeName(type.getTypeName());
-		 dto.setCapacity(type.getCapacity());
-		 dto.setPricePerNight(type.getPricePerNight());
-		
-		return dto;
 	}
-	
 }

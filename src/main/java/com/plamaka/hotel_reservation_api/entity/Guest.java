@@ -7,9 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -33,12 +31,7 @@ public class Guest {
 	@OneToMany(mappedBy = "guest")
 	private List<Reservation> reservations;
 	
-	private Boolean isDeleted;
-	
-	@OneToOne
-	@JoinColumn(name="user_id")
-	private User user;
-	
+	private Boolean isDeleted;	
 
 	public Guest() {
 	}
@@ -128,6 +121,4 @@ public class Guest {
 	public String getFullName() {
 		return firstName + " " + middleName + " " + lastName;
 	}	
-	
-	
 }

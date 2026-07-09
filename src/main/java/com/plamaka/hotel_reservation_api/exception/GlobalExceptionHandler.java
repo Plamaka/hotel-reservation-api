@@ -77,7 +77,7 @@ public class GlobalExceptionHandler {
 	    
 	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
 	}
-	//RoomHasReservationsException
+
 	@ExceptionHandler(RoomTypeNotFoundException.class)
 	public ResponseEntity<ErrorResponse> handleRoomTypeNotFound(
 			RoomTypeNotFoundException ex,
@@ -156,21 +156,5 @@ public class GlobalExceptionHandler {
 	    error.setPath(request.getRequestURI());
 	    
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-	}
-	
-	@ExceptionHandler(GuestIsDeletedException.class)
-	public ResponseEntity<ErrorResponse> handleGuestIsDeleted(
-			GuestIsDeletedException ex,
-	        HttpServletRequest request){
-
-	    ErrorResponse error = new ErrorResponse();
-
-	    error.setTimestamp(LocalDateTime.now());
-	    error.setStatus(HttpStatus.NOT_FOUND.value());
-	    error.setError(HttpStatus.NOT_FOUND.name());
-	    error.setMessage(ex.getMessage());
-	    error.setPath(request.getRequestURI());
-	    
-	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
 	}
 }

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.plamaka.hotel_reservation_api.entity.Reservation;
 import com.plamaka.hotel_reservation_api.enums.PaymentMethod;
 import com.plamaka.hotel_reservation_api.enums.ReservationStatus;
 
@@ -31,6 +32,22 @@ public class GetReservationResponseDTO {
 	private BigDecimal depositAmount;
 	
 	private BigDecimal totalAmount;
+	
+	public GetReservationResponseDTO(Reservation res, List<RoomReservationResponseDTO> rrrDTOs) {
+		super();
+		this.Id = res.getId();
+		this.status = res.getStatus();
+		this.guestId = res.getGuest().getId();
+		this.guestFullName = res.getGuest().getFullName();
+		this.guestPhoneNumber = res.getGuest().getPhoneNumber();
+		this.checkInDate = res.getCheckInDate();
+		this.checkOutDate = res.getCheckOutDate();
+		this.rooms = rrrDTOs;
+		this.guestPerson = res.getGuestPersons().size();
+		this.paymentMethod = res.getPaymentMethod();
+		this.depositAmount = res.getDepositAmount();
+		this.totalAmount = res.getTotalAmount();		
+	}
 
 	public Long getId() {
 		return Id;

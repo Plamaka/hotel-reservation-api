@@ -1,6 +1,6 @@
 package com.plamaka.hotel_reservation_api.dto.response;
 
-
+import com.plamaka.hotel_reservation_api.entity.Room;
 
 public class RoomReservationResponseDTO {
 	private Long id;
@@ -10,6 +10,13 @@ public class RoomReservationResponseDTO {
 	private String roomNumber;
 	
 	private Integer floor;
+	
+	public RoomReservationResponseDTO(Room room) {
+		this.id = room.getId();
+		this.typeName = room.getRoomType().getTypeName();
+		this.roomNumber = room.getRoomNumber();
+		this.floor = room.getFloor();
+	}
 
 	public Long getId() {
 		return id;

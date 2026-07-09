@@ -20,15 +20,16 @@ public interface ReservationRoomRepository extends JpaRepository<ReservationRoom
 		    FROM ReservationRoom rr
 		    WHERE rr.room.id = :roomId
 		      AND rr.reservation.status <> 'CANCELED'
-		    		      // Ako checkout >= today
+		      AND rr.reservation.checkOutDate >= :timeNow
 		      AND rr.reservation.checkInDate < :checkOut
 		      AND rr.reservation.checkOutDate > :checkIn
 		    """)
 	Optional<ReservationRoom> findConflictingReservation(
 			@Param("roomId") Long roomId,
+			@Param("status") ReservationStatus status,
+			@Param("timeNow") LocalDate timeNow,
 			@Param("checkOut") LocalDate checkOut,
-			@Param("checkIn") LocalDate checkIn,
-			@Param("status") ReservationStatus status);
+			@Param("checkIn") LocalDate checkIn);
 
 	List<ReservationRoom> findByReservationId(Long reservationId);
 	

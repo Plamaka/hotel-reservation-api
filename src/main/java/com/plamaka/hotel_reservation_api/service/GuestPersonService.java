@@ -31,22 +31,12 @@ public class GuestPersonService {
 		Reservation reservation = reservationRepository.findById(requestDto.getReservationId()).orElseThrow(
 				() -> new ReservationNotFoundException(requestDto.getReservationId()));
 		
-		GuestPerson person = new GuestPerson(
-				requestDto.getFirstName(),
-				requestDto.getLastName(),
-				requestDto.getBirthDate());
-		
+		GuestPerson person = new GuestPerson(requestDto);
 		person.setGuestType(isLegal(requestDto.getBirthDate()));
 		person.setReservation(reservation);
 		
 		GuestPerson saved = guestPersonRepository.save(person);
-		
-		GuestPersonResponseDTO response = new GuestPersonResponseDTO();
-		
-		response.setFullName(saved.toStringFullName());
-		response.setGuestType(saved.getGuestType());
-		
-		return response;	
+		return new GuestPersonResponseDTO(saved);
 	}
 	
 	public GuestPersonResponseDTO updatePersonGuest(Long id, GuestPersonRequeastDTO requestDto) {
@@ -54,19 +44,10 @@ public class GuestPersonService {
 		GuestPerson person = guestPersonRepository.findById(id).orElseThrow(
 				() -> new GuestPersonNotFoundException(id));
 		
-		person.setFirstName(requestDto.getFirstName());
-		person.setLastName(requestDto.getLastName());
-		person.setBirthDate(requestDto.getBirthDate());
-		person.setGuestType(isLegal(requestDto.getBirthDate()));
+		setGuestPersonFromDTO(person,requestDto);		
+		GuestPerson saved = guestPersonRepository.save(person);	
 		
-		GuestPerson saved = guestPersonRepository.save(person);
-		
-		GuestPersonResponseDTO response = new GuestPersonResponseDTO();
-		
-		response.setFullName(saved.toStringFullName());
-		response.setGuestType(saved.getGuestType());
-		
-		return response;	
+		return new GuestPersonResponseDTO(saved);
 	}
 	
 	public void removePersonGuest(Long personId) {
@@ -76,8 +57,14 @@ public class GuestPersonService {
 		guestPersonRepository.delete(person);
 	}
 	
+	public static void setGuestPersonFromDTO(GuestPerson person, GuestPersonRequeastDTO requestDto) {
+		person.setFirstName(requestDto.getFirstName());
+		person.setLastName(requestDto.getLastName());
+		person.setBirthDate(requestDto.getBirthDate());
+		person.setGuestType(isLegal(requestDto.getBirthDate()));
+	}
 	
-	public GuestType isLegal(LocalDate birthDate) {
+	public static GuestType isLegal(LocalDate birthDate) {
 		Period period = Period.between(birthDate, LocalDate.now());
 		
 		if(period.getYears() >= 18) {
@@ -87,4 +74,5 @@ public class GuestPersonService {
 			return GuestType.CHILD;
 		}
 	}
+	
 }

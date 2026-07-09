@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.plamaka.hotel_reservation_api.dto.request.ReservationRequestDTO;
 import com.plamaka.hotel_reservation_api.enums.PaymentMethod;
 import com.plamaka.hotel_reservation_api.enums.ReservationStatus;
 
@@ -54,13 +55,13 @@ public class Reservation {
 	public Reservation() {
 	}
 
-	public Reservation(ReservationStatus status, LocalDate checkInDate,
-			LocalDate checkOutDate, PaymentMethod paymentMethod) {
+	public Reservation(ReservationRequestDTO requestDto, Guest guest) {
 		super();
-		this.status = status;
-		this.checkInDate = checkInDate;
-		this.checkOutDate = checkOutDate;
-		this.paymentMethod = paymentMethod;
+		this.guest = guest;
+		this.status = ReservationStatus.PENDING;
+		this.checkInDate = requestDto.getCheckInDate();
+		this.checkOutDate = requestDto.getCheckOutDate();
+		this.paymentMethod = requestDto.getPaymentMethod();
 	}
 
 	public BigDecimal getTotalAmount() {

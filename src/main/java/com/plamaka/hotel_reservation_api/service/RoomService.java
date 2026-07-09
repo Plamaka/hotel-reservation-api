@@ -34,101 +34,43 @@ public class RoomService {
 	}
 	
 	public List<RoomResponseDTO> findAvailableRooms(){
+		
 		List<Room> rooms = roomRepository.findByRoomStatus(RoomStatus.AVAILABLE);
 		
 		List<RoomResponseDTO> respons = new ArrayList<>();
-		
-		for(var room : rooms) {
-			RoomResponseDTO dto = new RoomResponseDTO();
-			
-			dto.setId(room.getId());
-			dto.setRoomNumber(room.getRoomNumber());
-			dto.setFloor(room.getFloor());
-			dto.setRoomStatus(room.getRoomStatus());
-			dto.setTypeName(room.getRoomType().getTypeName());
-			dto.setCapacity(room.getRoomType().getCapacity());
-			dto.setPricePerNight(room.getRoomType().getPricePerNight());
-			dto.setBalcony(room.getBalcony());
-			dto.setPetsAllowed(room.getRoomType().getPetsAllowed());
-			
-			respons.add(dto);
-		}
+		populateRoomToDTO(rooms, respons);
 		
 		return respons;
 	}
 	
 	public List<RoomResponseDTO> findRoomsByStatus(RoomStatus status){
+		
 		List<Room> rooms = roomRepository.findByRoomStatus(status);
 		
 		List<RoomResponseDTO> respons = new ArrayList<>();
-		
-		for(var room : rooms) {
-			RoomResponseDTO dto = new RoomResponseDTO();
-			
-			dto.setId(room.getId());
-			dto.setRoomNumber(room.getRoomNumber());
-			dto.setFloor(room.getFloor());
-			dto.setRoomStatus(room.getRoomStatus());
-			dto.setTypeName(room.getRoomType().getTypeName());
-			dto.setCapacity(room.getRoomType().getCapacity());
-			dto.setPricePerNight(room.getRoomType().getPricePerNight());
-			dto.setBalcony(room.getBalcony());
-			dto.setPetsAllowed(room.getRoomType().getPetsAllowed());
-			
-			respons.add(dto);
-		}
+		populateRoomToDTO(rooms, respons);
 		
 		return respons;
 	}
 	
 	public List<RoomResponseDTO> findRoomsByFloor(Integer floor){
+		
 		List<Room> rooms = roomRepository.findByFloor(floor);
 		
 		List<RoomResponseDTO> respons = new ArrayList<>();
+		populateRoomToDTO(rooms, respons);
 		
-		for(var room : rooms) {
-			RoomResponseDTO dto = new RoomResponseDTO();
-			
-			dto.setId(room.getId());
-			dto.setRoomNumber(room.getRoomNumber());
-			dto.setFloor(room.getFloor());
-			dto.setRoomStatus(room.getRoomStatus());
-			dto.setTypeName(room.getRoomType().getTypeName());
-			dto.setCapacity(room.getRoomType().getCapacity());
-			dto.setPricePerNight(room.getRoomType().getPricePerNight());
-			dto.setBalcony(room.getBalcony());
-			dto.setPetsAllowed(room.getRoomType().getPetsAllowed());
-			
-			respons.add(dto);
-		}
-		
-		return respons;
-		
+		return respons;	
 	}
 	
 	public List<RoomResponseDTO> findRoomsByRoomType(String type){
+		
 		List<Room> rooms = roomRepository.findByRoomTypeTypeName(type);
 		
 		List<RoomResponseDTO> respons = new ArrayList<>();
+		populateRoomToDTO(rooms, respons);
 		
-		for(var room : rooms) {
-			RoomResponseDTO dto = new RoomResponseDTO();
-			
-			dto.setId(room.getId());
-			dto.setRoomNumber(room.getRoomNumber());
-			dto.setFloor(room.getFloor());
-			dto.setRoomStatus(room.getRoomStatus());
-			dto.setTypeName(room.getRoomType().getTypeName());
-			dto.setCapacity(room.getRoomType().getCapacity());
-			dto.setPricePerNight(room.getRoomType().getPricePerNight());
-			dto.setBalcony(room.getBalcony());
-			dto.setPetsAllowed(room.getRoomType().getPetsAllowed());
-			
-			respons.add(dto);
-		}
-		
-		return respons;
-		
+		return respons;	
 	}
 	
 	public RoomResponseDTO addRoom(RoomRequestDTO requestDto) {
@@ -136,29 +78,11 @@ public class RoomService {
 		RoomType type = roomTypeRepository.findById(requestDto.getRoomTypeId()).orElseThrow(
 				() -> new RoomNotFoundException(requestDto.getRoomTypeId()));
 		
-		Room room = new Room(
-				requestDto.getRoomNumber(), 
-				requestDto.getFloor(),
-				requestDto.getRoomstatus(),
-				requestDto.getBalcony());
-		
-		room.setRoomType(type);
-		
+		Room room = new Room(requestDto);	
+		room.setRoomType(type);	
 		Room saved = roomRepository.save(room);
 		
-		RoomResponseDTO dto = new RoomResponseDTO();
-		
-		dto.setId(saved.getId());
-		dto.setRoomNumber(saved.getRoomNumber());
-		dto.setFloor(saved.getFloor());
-		dto.setRoomStatus(saved.getRoomStatus());
-		dto.setTypeName(type.getTypeName());
-		dto.setCapacity(type.getCapacity());
-		dto.setPricePerNight(type.getPricePerNight());
-		dto.setBalcony(saved.getBalcony());
-		dto.setPetsAllowed(type.getPetsAllowed());
-		
-		return dto;
+		return new RoomResponseDTO(saved);
 	}
 	
 	public RoomResponseDTO updateRoom(Long id, RoomRequestDTO requestDto) {
@@ -169,27 +93,10 @@ public class RoomService {
 		RoomType type = roomTypeRepository.findById(requestDto.getRoomTypeId()).orElseThrow(
 				() -> new RoomTypeNotFoundException(requestDto.getRoomTypeId()));
 		
-		room.setRoomNumber(requestDto.getRoomNumber());
-		room.setFloor(requestDto.getFloor());
-		room.setRoomStatus(requestDto.getRoomstatus());
-		room.setBalcony(requestDto.getBalcony());
-		room.setRoomType(type);
-		
+		setRoomFromDTO(room, requestDto, type);	
 		Room saved = roomRepository.save(room);
-		
-		RoomResponseDTO dto = new RoomResponseDTO();
-		
-		dto.setId(saved.getId());
-		dto.setRoomNumber(saved.getRoomNumber());
-		dto.setFloor(saved.getFloor());
-		dto.setRoomStatus(saved.getRoomStatus());
-		dto.setTypeName(type.getTypeName());
-		dto.setCapacity(type.getCapacity());
-		dto.setPricePerNight(type.getPricePerNight());
-		dto.setBalcony(saved.getBalcony());
-		dto.setPetsAllowed(type.getPetsAllowed());
-		
-		return dto;
+	
+		return new RoomResponseDTO(saved);
 	}
 	
 	public void deleteRoom(Long id) {
@@ -206,8 +113,23 @@ public class RoomService {
 		    throw new RoomHasReservationsException(room.getId());
 		}
 		
-		roomRepository.delete(room);
-		
+		roomRepository.delete(room);		
+	}
+	
+
+	public static void populateRoomToDTO(List<Room> rooms, List<RoomResponseDTO> respons) {
+		for(var room : rooms) {
+			RoomResponseDTO dto = new RoomResponseDTO(room);
+			respons.add(dto);
+		}
+	}
+	
+	public static void setRoomFromDTO(Room room, RoomRequestDTO requestDto, RoomType type) {
+		room.setRoomNumber(requestDto.getRoomNumber());
+		room.setFloor(requestDto.getFloor());
+		room.setRoomStatus(requestDto.getRoomstatus());
+		room.setBalcony(requestDto.getBalcony());
+		room.setRoomType(type);
 	}
 	
 }
